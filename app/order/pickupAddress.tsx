@@ -1,5 +1,6 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -40,7 +41,7 @@ const PickupNowScreen = () => {
             </View>
 
             {/* Add New Address */}
-            <TouchableOpacity className="flex-row items-center justify-center mt-6 h-12 bg-gray-50 rounded-xl border border-gray-200">
+            <TouchableOpacity onPress={() => router.push("/order/addNewAddress")} className="flex-row items-center justify-center mt-6 h-12 bg-gray-50 rounded-xl border border-gray-200">
                 <Ionicons name="add-circle-outline" size={20} color="#017FC6" />
                 <Text className="text-[#017FC6] font-medium text-sm ml-2">
                     Add New Address
