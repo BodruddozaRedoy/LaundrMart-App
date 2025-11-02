@@ -1,6 +1,7 @@
 import { images } from '@/constants';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
 import {
     Image,
     ScrollView,
@@ -11,19 +12,23 @@ import {
 } from 'react-native';
 
 const SignInScreen = () => {
+    // 🔐 States
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
+
     return (
-      <ScrollView
-          contentContainerStyle={{ alignItems: 'center', padding: 20 }}
-          className="bg-white flex-grow"
-      >
-          {/* Logo */}
+        <ScrollView
+            contentContainerStyle={{ alignItems: 'center', padding: 20 }}
+            className="bg-white flex-grow"
+        >
+            {/* Logo */}
             <View className="mt-16 w-60 h-20">
-              <Image
-                  source={images.Logo}
-                  className="w-full h-full"
-                  resizeMode="contain"
-              />
-          </View>
+                <Image
+                    source={images.Logo}
+                    className="w-full h-full"
+                    resizeMode="contain"
+                />
+            </View>
 
           {/* Headings */}
             <Text className="text-3xl font-bold text-[#475569] mt-5">
@@ -33,6 +38,7 @@ const SignInScreen = () => {
 
           {/* Inputs */}
             <View className="w-full gap-5 mt-5">
+                {/* Email Field */}
               <View>
                   <Text className="mb-2 font-semibold text-[#64748B]">
                       Enter Email / Phone Number
@@ -44,29 +50,56 @@ const SignInScreen = () => {
                   />
               </View>
 
+                {/* Password Field */}
               <View>
                   <Text className="mb-2 font-semibold text-[#64748B]">Password</Text>
                   <View className="flex-row items-center border border-[#D4D3D3] rounded-lg px-4">
+                        {/* 🔒 Lock Icon */}
+                        <Ionicons
+                            name="lock-closed-outline"
+                            size={22}
+                            color="#94A3B8"
+                            className="mr-2"
+                        />
+
+                        {/* Password Input */}
                       <TextInput
                           placeholder="Type here..."
-                          secureTextEntry
+                            secureTextEntry={!showPassword}
                           className="flex-1 py-4"
                       />
-                      <Ionicons name="eye-off-outline" size={22} color="#94A3B8" />
+
+                        {/* 👁️ Eye Icon Toggle */}
+                        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                            <Ionicons
+                                name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                                size={22}
+                                color="#94A3B8"
+                            />
+                        </TouchableOpacity>
                   </View>
               </View>
           </View>
 
           {/* Remember Me + Forgot Password */}
           <View className="flex-row justify-between items-center w-full mt-3">
-              <View className="flex-row items-center">
-                  <Ionicons name="checkbox-outline" size={20} color="#2563EB" />
+                {/* ✅ Remember Me */}
+                <TouchableOpacity
+                    className="flex-row items-center"
+                    onPress={() => setRememberMe(!rememberMe)}
+                    activeOpacity={0.7}
+                >
+                    <Ionicons
+                        name={rememberMe ? 'checkbox-outline' : 'square-outline'}
+                        size={20}
+                        color={rememberMe ? '#2563EB' : '#94A3B8'}
+                    />
                   <Text className="ml-2 text-[#64748B]">Remember Me</Text>
-              </View>
-              <TouchableOpacity>
-                  <Text className="text-[#2563EB] font-medium">
-                      Forgot Password?
-                  </Text>
+                </TouchableOpacity>
+
+                {/* 🔗 Forgot Password */}
+                <TouchableOpacity onPress={() => router.push("/(auth)/forgetPassword")}>
+                    <Text className="text-[#2563EB] font-medium">Forgot Password?</Text>
               </TouchableOpacity>
           </View>
 
@@ -80,7 +113,7 @@ const SignInScreen = () => {
           {/* Sign Up link */}
           <View className="flex-row mt-4">
               <Text className="text-[#475569]">Don’t have an account? </Text>
-              <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/(auth)/signUp')}>
                   <Text className="text-[#2563EB] font-semibold">Sign Up</Text>
               </TouchableOpacity>
           </View>
