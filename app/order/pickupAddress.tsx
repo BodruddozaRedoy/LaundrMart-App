@@ -1,10 +1,12 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 const PickupNowScreen = () => {
+    const [address, setAddress] = useState("")
+
     return (
         <View className="flex-1 bg-white px-5 pt-5">
             {/* Section Title */}
@@ -14,7 +16,7 @@ const PickupNowScreen = () => {
             </Text>
 
             {/* Address Card */}
-            <View className="flex-row justify-between items-center border border-gray-200 rounded-2xl p-4 bg-white shadow-sm">
+            <TouchableOpacity onPress={() => setAddress("home")} className={`flex-row justify-between items-center border border-gray-200 rounded-2xl p-4 bg-white shadow-sm ${address === "home" && 'border-primary'}`}>
                 {/* Left Side */}
                 <View className=" flex-1 space-x-3">
                     <View className="flex-row">
@@ -36,9 +38,7 @@ const PickupNowScreen = () => {
                         123 Main St, San Francisco, CA 94102
                     </Text>
                 </View>
-
-
-            </View>
+            </TouchableOpacity>
 
             {/* Add New Address */}
             <TouchableOpacity onPress={() => router.push("/order/addNewAddress")} className="flex-row items-center justify-center mt-6 h-12 bg-gray-50 rounded-xl border border-gray-200">
