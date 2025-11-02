@@ -4,12 +4,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Dimensions,
   Image,
   ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
-  Dimensions,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
@@ -24,8 +25,10 @@ export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <ScrollView
-      className="flex-1 bg-white px-5"
+    <View className="flex-1 bg-white">
+      <StatusBar className="#fff" barStyle={"dark-content"} />
+      <ScrollView
+        className="flex-1 bg-white px-5 mb-14"
       contentContainerStyle={{ paddingBottom: 40 }}
       showsVerticalScrollIndicator={false}
     >
@@ -144,7 +147,8 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       </View>
+      </ScrollView>
       <SlideToOrder onSlideComplete={() => router.push("/order/placeOrder")} />
-    </ScrollView>
+    </View>
   );
 }

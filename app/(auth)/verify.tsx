@@ -11,6 +11,7 @@ import {
   View,
   TextInput as RNTextInput,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -56,6 +57,7 @@ const VerifyScreen: React.FC = () => {
       }}
       className="bg-white flex-grow"
     >
+      <StatusBar className="#fff" barStyle={"dark-content"} />
       {/* Logo */}
       <View className="mt-16 w-60 h-20">
         <Image

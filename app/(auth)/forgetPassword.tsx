@@ -5,6 +5,7 @@ import React from 'react';
 import {
     Image,
     ScrollView,
+  StatusBar,
     Text,
     TextInput,
     TouchableOpacity,
@@ -21,6 +22,7 @@ const ForgetPasswordScreen: React.FC = () => {
       }}
       className="bg-white flex-grow"
     >
+      <StatusBar className="#fff" barStyle={"dark-content"} />
       {/* Logo */}
       <View className="mt-24 w-60 h-20">
         <Image

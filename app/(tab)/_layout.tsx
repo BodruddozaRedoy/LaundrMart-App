@@ -10,7 +10,7 @@ export default function TabsLayout() {
     iconComponent: React.ReactNode
   ): React.ReactNode => (
     <View
-      className={`items-center justify-center rounded-full mb-3 ${focused ? "bg-[#2563EB]" : "bg-transparent"
+      className={`items-center justify-center rounded-full mb-3 ${focused ? "bg-primary" : "bg-transparent"
         }`}
       style={{
         width: 50,

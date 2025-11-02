@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import {
     Image,
     ScrollView,
+    StatusBar,
     Text,
     TextInput,
     TouchableOpacity,
@@ -24,6 +25,7 @@ const SignUpScreen = () => {
             contentContainerStyle={{ alignItems: 'center', padding: 20 }}
             className="bg-white flex-grow"
         >
+            <StatusBar className="#fff" barStyle={"dark-content"} />
             {/* Logo */}
             <View className="mt-16 w-60 h-20">
                 <Image
