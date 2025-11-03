@@ -12,6 +12,8 @@ export default function OrderLayout() {
         "placeOrder": "Place Order",
         "pickupAddress": "Pickup Now",
         "addNewAddress": "Add Location",
+        "chooseLaundryMart": "Choose Laundry Mart",
+        "chooseLaundryMart": "Choose Laundry Mart",
     };
 
     const currentSegment = segments[segments.length - 1];

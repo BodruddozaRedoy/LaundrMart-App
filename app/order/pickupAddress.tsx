@@ -49,7 +49,7 @@ const PickupNowScreen = () => {
             </TouchableOpacity>
 
             {/* Continue Button */}
-            <TouchableOpacity className="w-full absolute bottom-10 right-5 left-5">
+            <TouchableOpacity onPress={() => router.push("/order/chooseLaundryMart")} className="w-full absolute bottom-10 right-5 left-5">
                 <PrimaryButton text="Continue" />
             </TouchableOpacity>
         </View>
