@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from '@expo/vector-icons/Entypo';
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
     FlatList,
@@ -135,7 +136,7 @@ const ChatScreen = () => {
     <SafeAreaView className="flex-1 bg-white pt-5">
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 border-b border-gray-100">
-        <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/more")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
 

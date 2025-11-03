@@ -94,7 +94,7 @@ const SupportChatScreen = () => {
     <SafeAreaView className="flex-1 bg-white px-5">
       {/* Header */}
       <View className="flex-row items-center mb-4 mt-2">
-        <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/more")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
