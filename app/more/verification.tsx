@@ -1,18 +1,21 @@
+import PrimaryButton from "@/components/shared/PrimaryButton";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const VerificationScreen = () => {
   return (
-    <View className="flex-1 bg-white px-5 pt-10">
+      <SafeAreaView className="flex-1 bg-white px-5 pt-5">
       {/* Header */}
       <View className="flex-row items-center mb-6">
-        <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/more")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
@@ -42,12 +45,10 @@ const VerificationScreen = () => {
       </View>
 
       {/* Button */}
-      <TouchableOpacity className="bg-[#007AFF] rounded-xl py-3">
-        <Text className="text-white text-center font-semibold text-base">
-          Send OTP
-        </Text>
+          <TouchableOpacity className="w-full">
+              <PrimaryButton text="Send OTP" />
       </TouchableOpacity>
-    </View>
+      </SafeAreaView>
   );
 };
 
