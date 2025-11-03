@@ -8,7 +8,7 @@ const MoreScreen = () => {
     const menuItems = [
         { id: 1, icon: "person-outline", title: "Personal Info", link: "/more/profileInfo" },
         { id: 2, icon: "settings-outline", title: "Settings", link: "/more/settings" },
-        { id: 3, icon: "chatbubble-outline", title: "Support chat", link: "/more/profileInfo" },
+        { id: 3, icon: "chatbubble-outline", title: "Support chat", link: "/more/supportChat" },
         { id: 4, icon: "information-circle-outline", title: "Privacy & Policy", link: "/more/privacyPolicy" },
         { id: 5, icon: "information-circle-outline", title: "Terms & Conditions", link: "/more/termsConditions" },
         { id: 6, icon: "information-circle-outline", title: "Laundry Protection", link: "/more/laundryProtection" },
