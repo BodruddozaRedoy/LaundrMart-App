@@ -13,7 +13,8 @@ export default function OrderLayout() {
         "pickupAddress": "Pickup Now",
         "addNewAddress": "Add Location",
         "chooseLaundryMart": "Choose Laundry Mart",
-        "chooseLaundryMart": "Choose Laundry Mart",
+        "laundryDetails": "Laundry Details",
+        "bookNow": "Book Now",
     };
 
     const currentSegment = segments[segments.length - 1];

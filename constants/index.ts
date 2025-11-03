@@ -9,6 +9,7 @@ import Logo from "../assets/images/splash-icon.png";
 import CarBannerOne from "../assets/images/Car-banner 1.png";
 import SliderArrow from "../assets/icons/slider-arrow.png";
 import BotoshLaundry from "../assets/images/Botosh-Laundry.jpg";
+import { Laundry } from "@/types/laundry.types";
 
 export const images = {
   AuthWelcome,
@@ -25,7 +26,7 @@ export const images = {
   BotoshLaundry,
 };
 
-export const laundries = [
+export const laundries: Laundry[] = [
   {
     id: "1",
     name: "Botosh Laundry",
@@ -39,6 +40,8 @@ export const laundries = [
     hours: "Open · Closes 10PM",
     image:
       "https://img.freepik.com/premium-photo/washing-machine-service-shop_35752-2595.jpg?semt=ais_hybrid&w=740&q=80",
+    infoAlert:
+      "A $150 authorization hold will be placed on your card. You'll only be charged the final amount.",
     services: [
       {
         name: "Wash & Fold",
@@ -68,6 +71,11 @@ export const laundries = [
       { weekday: "Saturday", time: "9:00 AM - 5:00 PM" },
       { weekday: "Sunday", time: "Closed" },
     ],
+    serviceOptions: {
+      fullService: true,
+      dropOff: true,
+      pickup: true,
+    },
   },
   {
     id: "2",
@@ -82,6 +90,8 @@ export const laundries = [
     hours: "Open · Closes 9PM",
     image:
       "https://img.freepik.com/premium-photo/picture-washing-machines-big-showroom_259150-11994.jpg?semt=ais_hybrid&w=740&q=80",
+    infoAlert:
+      "A $100 authorization hold will be placed on your card. You’ll only be billed for the final service cost.",
     services: [
       {
         name: "Wash & Fold",
@@ -111,6 +121,11 @@ export const laundries = [
       { weekday: "Saturday", time: "9:00 AM - 6:00 PM" },
       { weekday: "Sunday", time: "9:00 AM - 5:00 PM" },
     ],
+    serviceOptions: {
+      fullService: true,
+      dropOff: true,
+      pickup: true,
+    },
   },
   {
     id: "3",
@@ -125,6 +140,8 @@ export const laundries = [
     hours: "Open · Closes 10PM",
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6BXEXGolJTcftc59VS8ljzR-xNi1VcIAH9g&s",
+    infoAlert:
+      "A $120 authorization hold will be applied. This will be adjusted to the final total after service completion.",
     services: [
       {
         name: "Wash & Fold",
@@ -154,6 +171,10 @@ export const laundries = [
       { weekday: "Saturday", time: "10:00 AM - 5:00 PM" },
       { weekday: "Sunday", time: "Closed" },
     ],
+    serviceOptions: {
+      fullService: false,
+      dropOff: true,
+      pickup: true,
+    },
   },
 ];
-

@@ -1,10 +1,12 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { Ionicons } from '@expo/vector-icons'
+import { router } from 'expo-router'
+import { Laundry } from '@/types/laundry.types'
 
-const LaundryCard = ({ item }: any) => {
+const LaundryCard = ({ item }: { item: Laundry }) => {
     return (
-        <TouchableOpacity className="bg-white rounded-2xl p-4 mb-4 border border-gray-200">
+        <TouchableOpacity onPress={() => router.push({ pathname: "/order/laundryDetails", params: { id: item.id } })} className="bg-white rounded-2xl p-4 mb-4 border border-gray-200">
             <View className="flex-row items-center">
                 <Image
                     source={{ uri: item.image }}
