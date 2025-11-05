@@ -28,7 +28,7 @@ const MoreScreen = () => {
                     />
                     <View className="flex-1">
                         <Text className="text-xl font-bold text-gray-800">
-                            Bodruddoza Redoy
+                            Mart User
                         </Text>
                         <Text className="text-sm text-gray-500">
                             bodruddozaredoy@gmail.com
