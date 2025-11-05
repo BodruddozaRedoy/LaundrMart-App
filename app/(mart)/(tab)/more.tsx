@@ -6,14 +6,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const MoreScreen = () => {
     const menuItems = [
-        { id: 1, icon: "person-outline", title: "Personal Info", link: "/(customer)/more/profileInfo" },
-        { id: 2, icon: "settings-outline", title: "Settings", link: "/(customer)/more/settings" },
-        { id: 3, icon: "chatbubble-outline", title: "Support chat", link: "/(customer)/more/supportChat" },
-        { id: 4, icon: "information-circle-outline", title: "Privacy & Policy", link: "/(customer)/more/privacyPolicy" },
-        { id: 5, icon: "information-circle-outline", title: "Terms & Conditions", link: "/(customer)/more/termsConditions" },
-        { id: 6, icon: "information-circle-outline", title: "Laundry Protection", link: "/(customer)/more/laundryProtection" },
-        { id: 7, icon: "help-circle-outline", title: "FAQ", link: "/(customer)/more/faq" },
-        { id: 8, icon: "log-out-outline", title: "Log Out", link: "/(customer)/welcome" },
+        { id: 1, icon: "person-outline", title: "Personal Info", link: "/(mart)/more/profileInfo" },
+        { id: 2, icon: "settings-outline", title: "Settings", link: "/(mart)/more/settings" },
+        { id: 3, icon: "chatbubble-outline", title: "Support chat", link: "/(mart)/more/supportChat" },
+        { id: 4, icon: "information-circle-outline", title: "Privacy & Policy", link: "/(mart)/more/privacyPolicy" },
+        { id: 5, icon: "information-circle-outline", title: "Terms & Conditions", link: "/(mart)/more/termsConditions" },
+        { id: 6, icon: "information-circle-outline", title: "Laundry Protection", link: "/(mart)/more/laundryProtection" },
+        { id: 7, icon: "help-circle-outline", title: "FAQ", link: "/(mart)/more/faq" },
+        { id: 8, icon: "log-out-outline", title: "Log Out", link: "/(mart)/welcome" },
     ];
 
     return (
