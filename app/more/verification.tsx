@@ -3,10 +3,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,7 +15,7 @@ const VerificationScreen = () => {
       <SafeAreaView className="flex-1 bg-white px-5 pt-5">
       {/* Header */}
       <View className="flex-row items-center mb-6">
-              <TouchableOpacity onPress={() => router.push("/more")}>
+        <TouchableOpacity onPress={() => router.push("/more/profileInfo")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
