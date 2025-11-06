@@ -75,7 +75,7 @@ export default function PricingInfoScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={onContinue}
+                    onPress={() => router.push("/(mart)/onboarding/turnaroundInformation")}
                     className="flex-1 bg-primary rounded-lg py-3"
                     activeOpacity={0.8}
                 >
