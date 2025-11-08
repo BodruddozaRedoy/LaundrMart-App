@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -8,9 +9,7 @@ const LaundryProtection = () => {
   return (
     <SafeAreaView className="flex-1 bg-white mt-5">
       <View className="flex-row items-center px-5 mb-4">
-        <TouchableOpacity onPress={() => router.push("/more")}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
+        <HeaderBackButton onPress={() => router.push("/(customer)/(tab)/more")} />
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
           Laundry Protection
         </Text>

@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -11,9 +12,7 @@ const SettingsScreen = () => {
     <SafeAreaView className="flex-1 bg-white px-5">
       {/* Header */}
       <View className="flex-row items-center mb-5 mt-2">
-        <TouchableOpacity onPress={() => router.push("/more")}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
+        <HeaderBackButton onPress={() => router.push("/(customer)/(tab)/more")} />
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
           Settings
         </Text>

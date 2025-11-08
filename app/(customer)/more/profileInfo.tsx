@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -24,9 +25,7 @@ const PersonalInfoScreen = () => {
             <KeyboardAvoidingView behavior="padding" className="flex-1 bg-white px-5 pt-5">
                 {/* Header */}
                 <View className="flex-row items-center mb-6">
-                    <TouchableOpacity onPress={() => router.push("/(tab)/more")}>
-                        <Ionicons name="arrow-back" size={24} color="black" />
-                    </TouchableOpacity>
+                        <HeaderBackButton onPress={() => router.push("/(customer)/(tab)/more")} />
                     <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
                         Personal Info
                     </Text>

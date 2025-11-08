@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -22,11 +23,9 @@ const InviteFriendsScreen = () => {
     return (
         <SafeAreaView className="flex-1 bg-white">
             {/* Header */}
-            <View className="flex-row items-center mb-4 mt-2">
-                <TouchableOpacity onPress={() => router.push("/more")}>
-                    <Ionicons name="arrow-back" size={24} color="black" />
-                </TouchableOpacity>
-                <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
+            <View className="flex-row items-center mb-4 mt-2 ml-5">
+                <HeaderBackButton onPress={() => router.push("/(customer)/(tab)/more")} />
+                <Text className="flex-1 ml-32 text-lg font-semibold text-gray-800">
                     Invite Friends
                 </Text>
             </View>
