@@ -101,12 +101,12 @@ const SignInScreen = () => {
 
                 {/* 🔗 Forgot Password */}
                 <TouchableOpacity onPress={() => router.push("/(auth)/forgetPassword")}>
-                    <Text className="text-[#2563EB] font-medium">Forgot Password?</Text>
+                    <Text className="text-primary font-medium">Forgot Password?</Text>
               </TouchableOpacity>
           </View>
 
           {/* Sign In Button */}
-            <TouchableOpacity className="bg-[#2563EB] w-full p-4 rounded-lg mt-10">
+            <TouchableOpacity onPress={() => router.push("/")} className="bg-primary w-full p-4 rounded-lg mt-10">
               <Text className="text-white text-center text-lg font-semibold">
                   Sign In
               </Text>
@@ -116,7 +116,7 @@ const SignInScreen = () => {
           <View className="flex-row mt-4">
               <Text className="text-[#475569]">Don’t have an account? </Text>
                 <TouchableOpacity onPress={() => router.push('/(auth)/signUp')}>
-                  <Text className="text-[#2563EB] font-semibold">Sign Up</Text>
+                    <Text className="text-primary font-semibold">Sign Up</Text>
               </TouchableOpacity>
           </View>
 
@@ -148,7 +148,7 @@ const SignInScreen = () => {
 
             {/* Continue as Guest */}
             <TouchableOpacity className="mt-8">
-                <Text className="text-[#2563EB] font-semibold text-lg">
+                <Text className="text-primary font-semibold text-lg">
                     Continue as a guest
                 </Text>
             </TouchableOpacity>

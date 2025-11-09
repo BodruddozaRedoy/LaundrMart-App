@@ -38,6 +38,12 @@ const MoreScreen = () => {
         {
             id: 6,
             icon: "help-circle-outline",
+            title: "Support Chat",
+            link: "/(mart)/more/supportChat",
+        },
+        {
+            id: 7,
+            icon: "help-circle-outline",
             title: "FAQ",
             link: "/(mart)/more/faq",
         },
