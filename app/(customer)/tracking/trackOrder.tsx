@@ -1,6 +1,7 @@
 import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { orders } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
@@ -105,7 +106,7 @@ export default function TrackOrderScreen() {
           </View>
           <View className="flex-row justify-between mb-1">
             <Text className="text-sm text-[#475569]">Total Cost</Text>
-            <Text className="text-sm font-semibold text-[#2563EB]">
+            <Text className="text-sm font-semibold text-primary">
               {order.totalCost}
             </Text>
           </View>
@@ -133,7 +134,7 @@ export default function TrackOrderScreen() {
                   {index < order.messages.length - 1 && (
                     <View
                       className={`w-[2px] flex-1 h-8 ${
-                        isCompleted ? "bg-[#2563EB]" : "bg-[#CBD5E1]"
+                        isCompleted ? "bg-primary" : "bg-[#CBD5E1]"
                       }`}
                     />
                   )}
@@ -143,7 +144,7 @@ export default function TrackOrderScreen() {
                 <View className="ml-4 mt-1">
                   <Text
                     className={`text-sm font-medium ${
-                      isCompleted ? "text-[#2563EB]" : "text-[#94A3B8]"
+                      isCompleted ? "text-primary" : "text-[#94A3B8]"
                     }`}
                   >
                     {step.title}
@@ -162,7 +163,7 @@ export default function TrackOrderScreen() {
         </View>
 
         {/* Driver Details */}
-        <View className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4 mt-3">
+        {/* <View className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4 mt-3">
           <Text className="text-base font-semibold text-[#1E293B] mb-3">
             Driver Details
           </Text>
@@ -188,7 +189,7 @@ export default function TrackOrderScreen() {
               <Ionicons name="call-outline" size={14} color="#2563EB" /> Call
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* LaundryMart Details */}
         <View className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4 mt-3 mb-5">
@@ -213,9 +214,9 @@ export default function TrackOrderScreen() {
               </View>
             </View>
           </View>
-          <TouchableOpacity className="bg-[#E0F2FE] py-2 rounded-xl items-center">
-            <Text className="text-[#2563EB] font-medium text-sm">
-              <Ionicons name="call-outline" size={14} color="#2563EB" /> Call
+          <TouchableOpacity className="bg-[#E0F2FE] py-3 rounded-xl items-center">
+            <Text className="text-primary font-medium text-sm">
+              <AntDesign name="message" size={14} color="#017FC6" /> Message
             </Text>
           </TouchableOpacity>
         </View>
