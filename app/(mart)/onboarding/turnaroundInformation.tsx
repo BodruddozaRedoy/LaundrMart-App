@@ -111,7 +111,7 @@ export default function TurnaroundInformationScreen() {
                             {day}
                         </Text>
 
-                        <View className="flex-row justify-between">
+                        <View className="flex-row items-center justify-between">
                             {/* Minimum Hour */}
                             <View className="flex-1   mr-2">
                                 <Text className="text-sm text-gray-500 font-semibold mb-1">Minimum Hour</Text>
@@ -143,7 +143,7 @@ export default function TurnaroundInformationScreen() {
                                     </View>
                                 </View>
                             </View>
-
+                            <View className="w-4 mt-5 h-0.5 rounded-lg bg-black" />
                             {/* Maximum Hour */}
                             <View className="flex-1 ml-2">
                                 <Text className="text-sm text-gray-500 font-semibold mb-1">Maximum Hour</Text>
