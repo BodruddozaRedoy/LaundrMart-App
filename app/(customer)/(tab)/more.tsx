@@ -141,7 +141,7 @@ const MoreScreen = () => {
                       <TouchableOpacity
                           key={sub.id}
                           onPress={() => router.push(sub.link)}
-                  className="flex-row items-center justify-between py-3 pl-10 border-b border-gray-50 bg-gray-50"
+                          className="flex-row items-center justify-between py-3"
               >
                   <View className="flex-row items-center">
                       <Ionicons name={sub.icon} size={20} color="#666" />
