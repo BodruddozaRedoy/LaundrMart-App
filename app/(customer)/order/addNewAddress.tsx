@@ -32,13 +32,14 @@ export default function AddNewAddress() {
                 const servicesEnabled = await Location.hasServicesEnabledAsync();
                 if (!servicesEnabled) {
             Alert.alert("Location Services Disabled", "Please enable location services.");
-            setRegion({
-                latitude: 23.8103,
-                longitude: 90.4125,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05 * (width / height),
-            });
-            return;
+                    return router.replace("/order/pickupAddress")
+                    // setRegion({
+                    //     latitude: 23.8103,
+                    //     longitude: 90.4125,
+                    //     latitudeDelta: 0.05,
+                    //     longitudeDelta: 0.05 * (width / height),
+                    // });
+                    // return;
         }
 
           const { status } = await Location.requestForegroundPermissionsAsync();
