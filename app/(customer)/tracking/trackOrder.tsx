@@ -214,11 +214,18 @@ export default function TrackOrderScreen() {
               </View>
             </View>
           </View>
-          <TouchableOpacity className="bg-[#E0F2FE] py-3 rounded-xl items-center">
+          <View className="flex-row gap-2 items-center ">
+            <TouchableOpacity className="bg-[#E0F2FE] w-1/2 py-3 rounded-xl items-center">
             <Text className="text-primary font-medium text-sm">
               <AntDesign name="message" size={14} color="#017FC6" /> Message
             </Text>
           </TouchableOpacity>
+            <TouchableOpacity className="bg-[#E0F2FE] py-3 w-1/2 rounded-xl items-center">
+              <Text className="text-primary font-medium text-sm">
+                <Ionicons name="call-outline" size={14} color="#017FC6" /> Call
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
