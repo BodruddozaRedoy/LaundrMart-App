@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 
 
-const role: "customer" | "mart" | null = "customer"; 
+const role: "customer" | "mart" | null = "mart"; 
 
 export default function Index() {
     if (!role) {

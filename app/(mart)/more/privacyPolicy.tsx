@@ -2,24 +2,47 @@ import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  View,
+  Dimensions,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+// 📌 Tablet detection
+const { width } = Dimensions.get("window");
+const isMd = width >= 768;
+const isLg = width >= 1024;
+
+// 📌 Font + Icon scaling
+const headerText = isLg ? "text-4xl" : isMd ? "text-3xl" : "text-lg";
+const subText = isLg ? "text-xl" : isMd ? "text-lg" : "text-xs";
+const bodyText = isLg ? "text-3xl" : isMd ? "text-2xl" : "text-md";
 
 const PrivacyPolicyScreen = () => {
   return (
-    <SafeAreaView className="flex-1 bg-white mt-5">
-      <View className="flex-row items-center px-5 mb-4">
+    <SafeAreaView className="flex-1 bg-white mt-5 md:mt-10 lg:mt-12">
+      {/* Header */}
+      <View className="flex-row items-center px-5 mb-4 md:mb-8 lg:mb-10">
         <HeaderBackButton onPress={() => router.push("/(mart)/(tab)/more")} />
-        <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
+        <Text
+          className={`flex-1 text-center font-semibold text-gray-800 ${headerText}`}
+        >
           Privacy Policy
         </Text>
       </View>
 
-      <ScrollView className="px-5 pt-5">
-        <Text className="text-xs text-gray-500 mb-2">
-          last Update: 10 Jun 2025
+      {/* Body */}
+      <ScrollView className="px-5 pt-5 md:px-10 lg:px-16 md:pt-8 lg:pt-10">
+        <Text className={`text-gray-500 mb-2 ${subText}`}>
+          Last Update: 10 Jun 2025
         </Text>
-        <Text className="text-md text-gray-700 leading-6 mb-6">
+
+        <Text
+          className={`text-gray-700 leading-6 mb-6 ${isLg ? "leading-10" : isMd ? "leading-8" : "leading-6"
+            } ${bodyText}`}
+        >
           Lorem ipsum dolor sit amet consectetur. Ultrices id feugiat venenatis
           habitant mattis viverra elementum purus volutpat. Lacus eu molestie
           pulvinar rhoncus integer proin elementum. Pretium sit fringilla massa
