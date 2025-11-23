@@ -1,14 +1,28 @@
 import { Redirect } from "expo-router";
+import { StatusBar, useColorScheme } from "react-native";
 
-
-const role: "customer" | "mart" | null = "mart"; 
+const role: "customer" | "mart" | null = "mart";
 
 export default function Index() {
-    if (!role) {
-        return <Redirect href="/(auth)/welcome" />;
-    }
+    const theme = useColorScheme();
 
-    return role === "mart"
-        ? <Redirect href="/(mart)/(tab)" />
-        : <Redirect href="/(customer)/(tab)" />;
+    return (
+        <>
+            {/* Status bar ALWAYS renders */}
+            <StatusBar
+                translucent={false}
+                backgroundColor={theme === "dark" ? "#000" : "#fff"}
+                barStyle={theme === "dark" ? "light-content" : "dark-content"}
+            />
+
+            {/* Redirect logic */}
+            {!role ? (
+                <Redirect href="/(auth)/welcome" />
+            ) : role === "mart" ? (
+                <Redirect href="/(mart)/(tab)" />
+            ) : (
+                <Redirect href="/(customer)/(tab)" />
+            )}
+        </>
+    );
 }
