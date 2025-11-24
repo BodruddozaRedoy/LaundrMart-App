@@ -1,4 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -46,7 +47,7 @@ export default function PrinterManageScreen() {
               className="bg-white/10 dark:bg-black/10 px-4 py-3 rounded-xl text-text dark:text-textDark"
             />
 
-            <TouchableOpacity className="bg-primary px-4 py-3 rounded-xl mt-3 items-center">
+            <TouchableOpacity onPress={() => router.push("/(mart)/more/PrinterTestScreen")} className="bg-primary px-4 py-3 rounded-xl mt-3 items-center">
               <Text className="text-white font-semibold">Add Printer</Text>
             </TouchableOpacity>
           </View>
