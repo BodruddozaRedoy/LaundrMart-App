@@ -20,7 +20,9 @@ export default {
           "LaundrMart needs access to your location to show nearby pickup addresses and help you find laundry services.",
         NSLocationAlwaysAndWhenInUseUsageDescription:
           "LaundrMart needs access to your location to provide location-based services.",
-        NSBonjourServices: ["_http._tcp."],
+        NSLocalNetworkUsageDescription:
+          "LaundrMart needs access to devices on your local network to connect to Epson receipt printers.",
+        NSBonjourServices: ["_http._tcp.", "_printer._tcp.", "_ipps._tcp."],
         NSAppTransportSecurity: {
           NSAllowsArbitraryLoads: true,
         },
