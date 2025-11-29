@@ -4,13 +4,13 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Dimensions,
   FlatList,
   Image,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -117,7 +117,7 @@ const ChatScreen = () => {
       {/* HEADER */}
       <View className="flex-row items-center px-4 py-3 border-b border-gray-100">
         <HeaderBackButton
-          onPress={() => router.push("/(customer)/more/supportChat")}
+          onPress={() => router.back()}
         />
 
         <View className="flex-row items-center ml-3 flex-1">

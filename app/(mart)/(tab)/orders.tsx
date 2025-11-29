@@ -169,7 +169,7 @@ export default function OrderScreen() {
                 <AntDesign name="info-circle" size={16} color="#017FC6" />
                 <Text className="text-primary">
                     All orders must be processed with whites and colors
-                    separated. Never mix different customers&apos; clothes.
+                    separated. Never mix different customer&apos;s clothes.
                 </Text>
             </View>
 
