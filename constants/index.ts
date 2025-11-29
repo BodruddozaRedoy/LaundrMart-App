@@ -9,8 +9,8 @@ import DropOff from "../assets/images/drop-off.png";
 import ForgetPassIllustration from "../assets/images/forget-password-illustration.png";
 import FullService from "../assets/images/full-service.png";
 import ReceiveParcel from "../assets/images/receive-parcel.png";
-import Logo from "../assets/images/splash-icon.png";
 import SliderLogo from "../assets/images/slider-logo.png";
+import Logo from "../assets/images/splash-icon.png";
 
 export const images = {
   AuthWelcome,
@@ -186,6 +186,8 @@ export const orders = [
     orderId: "#4253668c",
     date: "Oct 11, 2025",
     address: "Amberkhana, Sylhet",
+    customerName: "Bodruddoza Redoy",
+    customerPhone: "01758383869",
     bagSize: "small (~5 lbs)",
     canMix: "Yes",
     service: "Full Service",

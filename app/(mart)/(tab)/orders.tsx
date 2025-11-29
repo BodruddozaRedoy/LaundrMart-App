@@ -210,6 +210,23 @@ export default function OrderScreen() {
                                 {item.date}
                             </Text>
                         </View>
+                        {/* Customer Details */}
+                        <Text className="text-base md:text-2xl lg:text-3xl font-semibold text-[#1E293B] mb-1">
+                            Customer Details
+                        </Text>
+
+                        <View className="flex-row mb-3">
+                            <Ionicons name="person-circle-outline" size={isLg ? 40 : isMd ? 28 : 20} color="#0EA5E9" />
+                            <View className="ml-2">
+                                <Text className="text-sm md:text-xl lg:text-2xl text-[#1E293B] font-medium">
+                                    {item.customerName}
+                                </Text>
+                                <Text className="text-xs md:text-lg lg:text-xl text-[#64748B]">
+                                    {item.customerPhone}
+                                </Text>
+                            </View>
+                        </View>
+
 
                         {/* Address */}
                         <Text className="text-base md:text-2xl lg:text-3xl font-semibold text-[#1E293B] mb-1">
