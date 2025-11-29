@@ -1,5 +1,5 @@
 import { logoBase64 } from "@/assets/logo";
-import { orders } from "@/constants";
+import { orders as initialOrders } from "@/constants";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import * as Print from "expo-print";
 import { router } from "expo-router";
@@ -10,6 +10,7 @@ import {
     Modal,
     StatusBar,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -23,9 +24,6 @@ const isLg = width >= 1024;
 // 📌 Icon scaling
 const iconSize = isLg ? 34 : isMd ? 26 : 16;
 
-// 📌 Your full Base64 logo
-// const LOGO_BASE64 = `data:image/png;base64,a6xRgAN8WpV/3SRxaePxJMC+0Ko08oIQNp/VLVXxof4pNKKbGtOK8V/6sYT9w2ND... (TRUNCATED FOR DISPLAY) ...Upz71qU+/TfT/A6W0h7Ho4eihAAAAAElFTkSuQmCC`;
-
 export default function OrderScreen() {
     const [selectedTab, setSelectedTab] = useState<
         "Request" | "Active" | "Completed"
@@ -34,42 +32,36 @@ export default function OrderScreen() {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-    // 🔥 PRINT FUNCTION (Thermal-style receipt)
+    // Store updated orders (so weight can update)
+    const [orders, setOrders] = useState(initialOrders);
+
+    // 🔥 UPDATE WEIGHT FUNCTION
+    const updateWeight = (id: string, value: string) => {
+        setOrders((prev) =>
+            prev.map((order) =>
+                order.id === id ? { ...order, weight: value } : order
+            )
+        );
+    };
+
+    // 🔥 PRINT RECEIPT
     const handlePrintInvoice = async () => {
         setShowPrintModal(false);
 
         const html = `
             <html>
                 <body style="font-family: monospace; width: 260px; margin: 0 auto;">
-
-                    <!-- LOGO at Top (Option A) -->
                     <div style="text-align: center; margin-bottom: 10px; margin-top: 10px;">
-                        <img 
-                            src="${logoBase64}"
-                            style="width:160px; display:block; margin:0 auto;"
-                        />
+                        <img src="${logoBase64}" style="width:160px; display:block; margin:0 auto;" />
                         <h2 style="margin: 4px 0 0 0;">LaundrMart</h2>
-                        <p style="margin: 0;">Address: Lorem Ipsum, 23-10</p>
-                        <p style="margin: 0;">Telp. 11223344</p>
                         <p style="margin: 0;">Order ID: ${selectedOrder?.orderId}</p>
                     </div>
 
-                    <p style="text-align:center; margin: 12px 0;">
-                        *************************************
-                    </p>
-
+                    <p style="text-align:center; margin: 12px 0;">*************************************</p>
                     <h3 style="text-align:center; margin: 0;">INVOICE</h3>
-
-                    <p style="text-align:center; margin: 12px 0;">
-                        *************************************
-                    </p>
+                    <p style="text-align:center; margin: 12px 0;">*************************************</p>
 
                     <table style="width: 100%; font-size: 14px;">
-                        <tr>
-                            <th align="left">Description</th>
-                            <th align="right">Price</th>
-                        </tr>
-
                         <tr><td>Service</td><td align="right">${selectedOrder?.totalCost}</td></tr>
                     </table>
 
@@ -82,12 +74,8 @@ export default function OrderScreen() {
                         </tr>
                     </table>
 
-                    <p style="text-align:center; margin:12px 0;">
-                        *************************************
-                    </p>
-
+                    <p style="text-align:center; margin:12px 0;">*************************************</p>
                     <p style="text-align:center; margin: 12px 0;">THANK YOU!</p>
-
                 </body>
             </html>
         `;
@@ -145,7 +133,11 @@ export default function OrderScreen() {
                 <Text className="text-xl md:text-3xl lg:text-4xl font-bold text-[#1E293B]">
                     Order History
                 </Text>
-                <Ionicons name="search-outline" size={isLg ? 40 : isMd ? 30 : 22} color="#1E293B" />
+                <Ionicons
+                    name="search-outline"
+                    size={isLg ? 40 : isMd ? 30 : 22}
+                    color="#1E293B"
+                />
             </View>
 
             {/* Tabs */}
@@ -158,7 +150,9 @@ export default function OrderScreen() {
                             }`}
                     >
                         <Text
-                            className={`text-center text-sm md:text-xl lg:text-2xl font-medium ${selectedTab === tab ? "text-white" : "text-[#475569]"
+                            className={`text-center text-sm md:text-xl lg:text-2xl font-medium ${selectedTab === tab
+                                    ? "text-white"
+                                    : "text-[#475569]"
                                 }`}
                         >
                             {tab}
@@ -167,19 +161,17 @@ export default function OrderScreen() {
                 ))}
             </View>
 
-            {/* supporting test  */}
+            {/* Info text */}
             <View
                 className="bg-primary/20 py-3 rounded-lg mx-5 mt-3 gap-2 flex-row"
                 style={{ paddingHorizontal: isLg ? 40 : isMd ? 30 : 10 }}
             >
                 <AntDesign name="info-circle" size={16} color="#017FC6" />
                 <Text className="text-primary">
-                    All orders must be processed with whites and colors separated. Never mix
-                    different customers&apos; clothes. By using this account, you agree to our
-                    Terms &amp; Conditions and Privacy Policy.
+                    All orders must be processed with whites and colors
+                    separated. Never mix different customers&apos; clothes.
                 </Text>
             </View>
-
 
             {/* ORDERS LIST */}
             <FlatList
@@ -205,18 +197,27 @@ export default function OrderScreen() {
 
                         {/* Date */}
                         <View className="flex-row items-center mb-3">
-                            <Ionicons name="calendar-outline" size={iconSize} color="#64748B" />
+                            <Ionicons
+                                name="calendar-outline"
+                                size={iconSize}
+                                color="#64748B"
+                            />
                             <Text className="text-sm md:text-lg lg:text-xl text-[#64748B] ml-2">
                                 {item.date}
                             </Text>
                         </View>
+
                         {/* Customer Details */}
                         <Text className="text-base md:text-2xl lg:text-3xl font-semibold text-[#1E293B] mb-1">
                             Customer Details
                         </Text>
 
                         <View className="flex-row mb-3">
-                            <Ionicons name="person-circle-outline" size={isLg ? 40 : isMd ? 28 : 20} color="#0EA5E9" />
+                            <Ionicons
+                                name="person-circle-outline"
+                                size={isLg ? 40 : isMd ? 28 : 20}
+                                color="#0EA5E9"
+                            />
                             <View className="ml-2">
                                 <Text className="text-sm md:text-xl lg:text-2xl text-[#1E293B] font-medium">
                                     {item.customerName}
@@ -227,30 +228,59 @@ export default function OrderScreen() {
                             </View>
                         </View>
 
-
                         {/* Address */}
                         <Text className="text-base md:text-2xl lg:text-3xl font-semibold text-[#1E293B] mb-1">
                             Addresses
                         </Text>
                         <View className="flex-row items-center mb-3">
-                            <Ionicons name="location-outline" size={isLg ? 40 : isMd ? 28 : 18} color="#2563EB" />
+                            <Ionicons
+                                name="location-outline"
+                                size={isLg ? 40 : isMd ? 28 : 18}
+                                color="#2563EB"
+                            />
                             <Text className="text-sm md:text-xl lg:text-2xl text-[#1E293B] ml-2">
                                 {item.address}
                             </Text>
                         </View>
 
-                        {/* Details */}
+                        {/* WEIGHT INPUT */}
+                        {item.status === "Processing" && (
+                            <View className="mt-3">
+                                <Text className="text-sm md:text-xl lg:text-2xl font-semibold text-[#1E293B] mb-1">
+                                    Enter Total Weight
+                                </Text>
+
+                                <View className="flex-row items-center bg-white border border-[#CBD5E1] rounded-xl px-3 py-2 md:px-4 md:py-3 lg:px-5 lg:py-4">
+                                    <TextInput
+                                        placeholder="0.0"
+                                        keyboardType="numeric"
+                                        value={item.weight}
+                                        onChangeText={(val) =>
+                                            updateWeight(item.id, val)
+                                        }
+                                        className="flex-1 text-sm md:text-xl lg:text-2xl text-[#1E293B]"
+                                    />
+                                    <Text className="text-sm md:text-xl lg:text-2xl text-[#475569] ml-2">
+                                        kg
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+
+                        {/* DETAILS */}
                         <Text className="text-base md:text-2xl lg:text-3xl font-semibold text-[#1E293B] mb-2">
                             Order Details
                         </Text>
 
-                        {/* Each detail row */}
                         {[
                             ["Bag Size", item.bagSize],
                             ["Can clothes be mixed?", item.canMix],
                             ["Service", item.service],
                         ].map(([label, value], i) => (
-                            <View key={i} className="flex-row justify-between mb-1">
+                            <View
+                                key={i}
+                                className="flex-row justify-between mb-1"
+                            >
                                 <Text className="text-sm md:text-xl lg:text-2xl text-[#475569]">
                                     {label}
                                 </Text>
@@ -273,7 +303,9 @@ export default function OrderScreen() {
                         {/* Notes */}
                         <View className="bg-white border border-[#E2E8F0] rounded-xl p-3 mb-3 md:p-5 lg:p-6">
                             <Text className="text-xs md:text-lg lg:text-xl text-[#475569]">
-                                <Text className="font-semibold text-[#1E293B]">Notes: </Text>
+                                <Text className="font-semibold text-[#1E293B]">
+                                    Notes:{` `}
+                                </Text>
                                 {item.notes}
                             </Text>
                         </View>
@@ -313,7 +345,8 @@ export default function OrderScreen() {
                                 <TouchableOpacity
                                     onPress={() =>
                                         router.push({
-                                            pathname: "/(mart)/report/reportDamage",
+                                            pathname:
+                                                "/(mart)/report/reportDamage",
                                             params: { id: item.id },
                                         })
                                     }
@@ -340,12 +373,11 @@ export default function OrderScreen() {
                                 </Text>
                             </TouchableOpacity>
                         )}
-
                     </View>
                 )}
             />
 
-            {/* PRINT CONFIRMATION MODAL */}
+            {/* PRINT MODAL */}
             <Modal visible={showPrintModal} transparent animationType="fade">
                 <View className="flex-1 justify-center items-center bg-black/50">
                     <View className="bg-white w-80 p-6 rounded-2xl md:p-10 md:w-[500px] lg:w-[600px] lg:p-12">
