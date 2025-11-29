@@ -1,6 +1,6 @@
 import { logoBase64 } from "@/assets/logo";
 import { orders } from "@/constants";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import * as Print from "expo-print";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -154,7 +154,7 @@ export default function OrderScreen() {
                     <TouchableOpacity
                         key={tab}
                         onPress={() => setSelectedTab(tab as any)}
-                        className={`flex-1 py-2 md:py-3 lg:py-4 rounded-lg ${selectedTab === tab ? "bg-[#017FC6]" : "bg-transparent"
+                        className={`flex-1 py-2 md:py-3 lg:py-4 rounded-lg ${selectedTab === tab ? "bg-primary" : "bg-transparent"
                             }`}
                     >
                         <Text
@@ -166,6 +166,20 @@ export default function OrderScreen() {
                     </TouchableOpacity>
                 ))}
             </View>
+
+            {/* supporting test  */}
+            <View
+                className="bg-primary/20 py-3 rounded-lg mx-5 mt-3 gap-2 flex-row"
+                style={{ paddingHorizontal: isLg ? 40 : isMd ? 30 : 10 }}
+            >
+                <AntDesign name="info-circle" size={16} color="#017FC6" />
+                <Text className="text-primary">
+                    All orders must be processed with whites and colors separated. Never mix
+                    different customers&apos; clothes. By using this account, you agree to our
+                    Terms &amp; Conditions and Privacy Policy.
+                </Text>
+            </View>
+
 
             {/* ORDERS LIST */}
             <FlatList
@@ -234,7 +248,7 @@ export default function OrderScreen() {
                             <Text className="text-sm md:text-xl lg:text-2xl text-[#475569]">
                                 Estimated Cost
                             </Text>
-                            <Text className="text-sm md:text-2xl lg:text-3xl font-semibold text-[#2563EB]">
+                            <Text className="text-sm md:text-2xl lg:text-3xl font-semibold text-primary">
                                 {item.totalCost}
                             </Text>
                         </View>
@@ -256,7 +270,7 @@ export default function OrderScreen() {
                                     </Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex-1 bg-[#017FC6] rounded-lg py-2 md:py-3 lg:py-4 items-center">
+                                <TouchableOpacity className="flex-1 bg-primary rounded-lg py-2 md:py-3 lg:py-4 items-center">
                                     <Text className="text-sm md:text-xl lg:text-2xl font-medium text-white">
                                         Accept
                                     </Text>
