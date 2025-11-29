@@ -3,13 +3,13 @@ import { images } from '@/constants';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-    Image,
-    ScrollView,
+  Image,
+  ScrollView,
   StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const ForgetPasswordScreen: React.FC = () => {
@@ -70,13 +70,6 @@ const ForgetPasswordScreen: React.FC = () => {
         <PrimaryButton text="Send OTP" />
       </TouchableOpacity>
 
-      {/* Send OTP Button */}
-      <TouchableOpacity
-        onPress={() => router.push('/(auth)/resetPassword')}
-        className="w-full mt-5"
-      >
-        <PrimaryButton text="Reset Password" />
-      </TouchableOpacity>
     </ScrollView>
   );
 };
