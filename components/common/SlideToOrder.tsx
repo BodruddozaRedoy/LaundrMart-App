@@ -147,7 +147,7 @@ export default function SlideToOrder() {
                 {/* ✨ Let's Go! text (animated from bottom to top) */}
                 <Animated.View style={[styles.textLayer, letsGoStyle]}>
                     <Text style={[styles.behindText, { fontSize: 18, fontWeight: "700" }]}>
-                        Let's Go!
+                        Let&apos;s Go!
                     </Text>
                 </Animated.View>
 
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     logo: {
         position: "absolute",
         left: 160,
-        width: 40,
+        width: 30,
     },
     knob: {
         position: "absolute",
