@@ -7,6 +7,7 @@ import {
   registerUser,
   resendOtp,
   resetPassword,
+  setNewPassword,
   verifyOtp,
 } from "@/services/user.api";
 
@@ -17,6 +18,7 @@ import {
   RegisterPayload,
   ResendOtpPayload,
   ResetPasswordPayload,
+  SetPasswordPayload,
   VerifyOtpPayload,
 } from "@/types/user.types";
 
@@ -71,6 +73,15 @@ export const useUser = () => {
     mutationFn: resendOtp,
   });
 
+  /* -------- SET PASSWORD -------- */
+  const setPasswordMutation = useMutation<
+    AuthResponse,
+    Error,
+    SetPasswordPayload
+  >({
+    mutationFn: setNewPassword,
+  });
+
   /* LOGOUT */
   const logout = async () => {
     await AsyncStorage.removeItem("accessToken");
@@ -84,6 +95,7 @@ export const useUser = () => {
     resetPassword: resetPasswordMutation.mutateAsync,
     verifyOtp: verifyOtpMutation.mutateAsync,
     resendOtp: resendOtpMutation.mutateAsync,
+    setPassword: setPasswordMutation.mutateAsync,
     logout,
 
     /* states */
@@ -93,5 +105,6 @@ export const useUser = () => {
     resetPasswordState: resetPasswordMutation,
     verifyOtpState: verifyOtpMutation,
     resendOtpState: resendOtpMutation,
+    setPasswordState: setPasswordMutation,
   };
 };

@@ -28,7 +28,8 @@ export interface LoginPayload {
 }
 
 export interface ForgotPasswordPayload {
-  email: string;
+  email?: string;
+  phone_number?: string;
 }
 
 export interface ResetPasswordPayload {
@@ -44,4 +45,8 @@ export interface VerifyOtpPayload {
 export interface ResendOtpPayload {
   email?: string;
   phone_number?: string;
+}
+
+export interface SetPasswordPayload {
+  new_password: string;
 }

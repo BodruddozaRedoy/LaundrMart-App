@@ -88,7 +88,11 @@ const VerifyScreen: React.FC = () => {
       });
 
       success('Verified', res.message);
-      router.replace('/(auth)/signIn');
+      if (params?.action === "forget_pass") {
+        router.push("/(auth)/resetPassword")
+      } else {
+        router.replace('/(auth)/signIn');
+      }
     } catch (err: any) {
       error(
         'Verification Failed',
