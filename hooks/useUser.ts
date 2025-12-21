@@ -9,6 +9,7 @@ import {
   resendOtp,
   resetPassword,
   setNewPassword,
+  updateCustomerProfile,
   verifyOtp,
 } from "@/services/user.api";
 
@@ -21,6 +22,7 @@ import {
   ResendOtpPayload,
   ResetPasswordPayload,
   SetPasswordPayload,
+  UpdateCustomerProfilePayload,
   VerifyOtpPayload,
 } from "@/types/user.types";
 
@@ -68,6 +70,22 @@ export const useUser = () => {
     staleTime: Infinity,
     gcTime: Infinity, // ✅ instead of cacheTime
     retry: false,
+  });
+
+  /* ---------------- UPDATE CUSTOMER PROFILE ---------------- */
+  const updateProfileMutation = useMutation<
+    CustomerProfile,
+    Error,
+    UpdateCustomerProfilePayload
+  >({
+    mutationFn: updateCustomerProfile,
+    onSuccess: async (updatedProfile) => {
+      // 1️⃣ Save to storage
+      await storeProfile(updatedProfile);
+
+      // 2️⃣ Update query cache directly
+      queryClient.setQueryData(["customer-profile"], updatedProfile);
+    },
   });
 
   /* ---------------- FORGOT PASSWORD ---------------- */
@@ -141,6 +159,7 @@ export const useUser = () => {
     resendOtp: resendOtpMutation.mutateAsync,
     setPassword: setPasswordMutation.mutateAsync,
     logout,
+    updateProfile: updateProfileMutation.mutateAsync,
 
     /* states */
     registerState: registerMutation,
@@ -150,5 +169,6 @@ export const useUser = () => {
     verifyOtpState: verifyOtpMutation,
     resendOtpState: resendOtpMutation,
     setPasswordState: setPasswordMutation,
+    updateProfileState: updateProfileMutation,
   };
 };

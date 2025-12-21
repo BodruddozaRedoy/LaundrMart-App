@@ -8,6 +8,7 @@ import {
   ResendOtpPayload,
   ResetPasswordPayload,
   SetPasswordPayload,
+  UpdateCustomerProfilePayload,
   VerifyOtpPayload,
 } from "@/types/user.types";
 
@@ -61,5 +62,12 @@ export const setNewPassword = async (
 ): Promise<AuthResponse> => {
   const { data } = await api.patch("/accounts/api/change-password", payload);
   //   console.log(data);
+  return data;
+};
+
+export const updateCustomerProfile = async (
+  payload: UpdateCustomerProfilePayload
+): Promise<CustomerProfile> => {
+  const { data } = await api.patch("/accounts/api/customer-profile", payload);
   return data;
 };

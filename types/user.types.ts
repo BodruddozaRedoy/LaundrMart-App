@@ -54,11 +54,24 @@ export interface SetPasswordPayload {
 export interface CustomerProfile {
   id: string;
   name?: string;
+  full_name: string;
   email?: string;
   image: string;
   phone_number?: string;
+  is_verified: boolean;
   role: "Customer";
   location?: string;
   lat: string;
   lng: string;
 }
+
+export interface UpdateCustomerProfilePayload {
+  full_name?: string;
+  email?: string;
+  phone_number?: string;
+  image?: string;
+  location?: string;
+  lat?: string;
+  lng?: string;
+}
+
