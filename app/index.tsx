@@ -18,8 +18,6 @@ export default function Index() {
             {/* Redirect logic */}
             {!role ? (
                 <Redirect href="/(auth)/welcome" />
-            ) : role === "mart" ? (
-                <Redirect href="/(mart)/(tab)" />
             ) : (
                 <Redirect href="/(customer)/(tab)" />
             )}
