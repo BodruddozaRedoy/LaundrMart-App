@@ -1,7 +1,10 @@
+import { api } from "@/lib/axios";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Text,
@@ -14,73 +17,46 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SupportChatScreen = () => {
   const [search, setSearch] = useState("");
 
-  const messages = [
-    {
-      id: "1",
-      name: "Shirts Laundry",
-      message: "You are available?",
-      time: "19:45",
-      unread: true,
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
+  const {
+    data: messages = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["supportChat"],
+    queryFn: async () => {
+      const res = await api.get("/message/api/room");
+      return res.data.data ?? [];
     },
-    {
-      id: "2",
-      name: "Shirts Laundry",
-      message: "You are available?",
-      time: "19:45",
-      unread: false,
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-    },
-    {
-      id: "3",
-      name: "Shirts Laundry",
-      message: "You are available?",
-      time: "19:45",
-      unread: true,
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-    },
-    {
-      id: "4",
-      name: "Shirts Laundry",
-      message: "You are available?",
-      time: "19:45",
-      unread: false,
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-    },
-    {
-      id: "5",
-      name: "Shirts Laundry",
-      message: "You are available?",
-      time: "19:45",
-      unread: false,
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-    },
-    {
-      id: "6",
-      name: "Shirts Laundry",
-      message: "You are available?",
-      time: "19:45",
-      unread: true,
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-    },
-  ];
+  });
 
-  const filtered = messages.filter((msg) =>
-    msg.name.toLowerCase().includes(search.toLowerCase())
-  );
+  /** 🔍 Safe filtering */
+  const filtered = useMemo(() => {
+    return messages.filter((msg: any) =>
+      msg?.name?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [messages, search]);
 
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity onPress={() => router.push("/(customer)/more/chat")} className="flex-row items-center justify-between py-3 border-b border-gray-100">
-      {/* Left Section */}
+    <TouchableOpacity
+      onPress={() => router.push("/(customer)/more/chat")}
+      className="flex-row items-center justify-between py-3 border-b border-gray-100"
+    >
+      {/* Left */}
       <View className="flex-row items-center">
-        <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
+        <Image
+          source={{ uri: item.avatar }}
+          className="w-12 h-12 rounded-full bg-gray-200"
+        />
         <View className="ml-3">
           <Text className="text-gray-800 font-semibold">{item.name}</Text>
-          <Text className="text-gray-500 text-sm">{item.message}</Text>
+          <Text className="text-gray-500 text-sm" numberOfLines={1}>
+            {item.message}
+          </Text>
         </View>
       </View>
 
-      {/* Right Section */}
+      {/* Right */}
       <View className="items-end">
         <Text className="text-gray-500 text-xs mb-1">{item.time}</Text>
         {item.unread && (
@@ -94,7 +70,7 @@ const SupportChatScreen = () => {
     <SafeAreaView className="flex-1 bg-white px-5">
       {/* Header */}
       <View className="flex-row items-center mb-4 mt-2">
-              <TouchableOpacity onPress={() => router.push("/more")}>
+        <TouchableOpacity onPress={() => router.push("/more")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
@@ -102,7 +78,7 @@ const SupportChatScreen = () => {
         </Text>
       </View>
 
-      {/* Search Bar */}
+      {/* Search */}
       <View className="flex-row items-center bg-gray-100 rounded-xl px-3 py-2 mb-3">
         <Ionicons name="search-outline" size={18} color="#888" />
         <TextInput
@@ -114,13 +90,44 @@ const SupportChatScreen = () => {
         />
       </View>
 
-      {/* Messages List */}
-      <FlatList
-        data={filtered}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* 🔄 Loading */}
+      {isLoading && (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      )}
+
+      {/* ❌ Error */}
+      {isError && (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-gray-500 mb-3">
+            Failed to load messages
+          </Text>
+          <TouchableOpacity
+            onPress={refetch}
+            className="px-4 py-2 bg-black rounded-full"
+          >
+            <Text className="text-white">Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* 📭 Empty */}
+      {!isLoading && !isError && filtered.length === 0 && (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-gray-400">No conversations found</Text>
+        </View>
+      )}
+
+      {/* 📩 List */}
+      {!isLoading && !isError && (
+        <FlatList
+          data={filtered}
+          renderItem={renderItem}
+          keyExtractor={(item) => String(item.id)}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </SafeAreaView>
   );
 };
