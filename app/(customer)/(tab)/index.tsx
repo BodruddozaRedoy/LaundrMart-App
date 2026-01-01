@@ -45,7 +45,7 @@ export default function HomeScreen() {
         <View className="flex-row justify-between items-center mt-7 mb-6">
           <View>
             <Text className="text-2xl font-bold text-[#1E293B]">
-              Hello, {customerProfile?.full_name || "There"} 👋
+              Hello, {customerProfile?.full_name || "there"} 👋
             </Text>
             <Text className="text-[#64748B] text-md mt-1">
               Ready for laundry?

@@ -91,6 +91,7 @@ export default function AddNewAddress() {
               latitude: region.latitude,
               longitude: region.longitude,
           });
+          console.log(place)
 
         const address =
             [place?.name, place?.street, place?.city, place?.region]
