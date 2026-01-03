@@ -9,8 +9,10 @@ import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Dimensions,
   FlatList, Image,
-  Platform, Text, TextInput, TouchableOpacity, View
+  Modal,
+  Platform, StatusBar, Text, TextInput, TouchableOpacity, View
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,18 +28,105 @@ interface ChatMessage {
   created_at: string;
 }
 
-const MessageItem = React.memo(({ item, myUserId }: { item: ChatMessage; myUserId: number }) => {
-  const isMe = item.sender === myUserId;
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+const ImageViewer = ({
+  visible,
+  uri,
+  onClose,
+}: {
+  visible: boolean;
+  uri: string | null;
+  onClose: () => void;
+}) => {
+  if (!uri) return null;
+
   return (
-    <View className={`flex-row ${isMe ? "justify-end" : "justify-start"} mb-3 px-2`}>
-      <View className={`max-w-[75%] p-3 rounded-2xl ${isMe ? "bg-primary" : "bg-gray-100"}`}>
-        {item.text && <Text className={`text-sm ${isMe ? "text-white" : "text-gray-800"}`}>{item.text}</Text>}
-        {item.file && <Image source={{ uri: item.file }} className="w-48 h-48 rounded-xl mt-2" resizeMode="cover" />}
-      </View>
-    </View>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      statusBarTranslucent
+    >
+      <SafeAreaView className="flex-1 bg-black">
+        <StatusBar backgroundColor={"transparent"} barStyle={"light-content"} />
+        {/* Close Button */}
+        <TouchableOpacity
+          onPress={onClose}
+          className="absolute top-4 right-4 z-20 mt-5"
+        >
+          <Ionicons name="close" size={32} color="white" />
+        </TouchableOpacity>
+
+        {/* Image Container */}
+        <View className="flex-1 justify-center items-center px-4">
+          <Image
+            source={{ uri }}
+            resizeMode="contain"
+            style={{
+              width: "100%",
+              height: SCREEN_HEIGHT * 0.75, // ✅ REQUIRED
+            }}
+          />
+        </View>
+      </SafeAreaView>
+    </Modal>
   );
-});
+};
+
+
+
+const MessageItem = React.memo(
+  ({
+    item,
+    myUserId,
+    onImagePress,
+  }: {
+    item: ChatMessage;
+    myUserId: number;
+    onImagePress: (uri: string) => void;
+  }) => {
+    const isMe = item.sender === myUserId;
+
+    return (
+      <View
+        className={`flex-row ${isMe ? "justify-end" : "justify-start"
+          } mb-3 px-2`}
+      >
+        <View
+          className={`max-w-[75%] p-3 rounded-2xl ${isMe ? "bg-primary" : "bg-gray-100"
+            }`}
+        >
+          {item.text && (
+            <Text
+              className={`text-sm ${isMe ? "text-white" : "text-gray-800"
+                }`}
+            >
+              {item.text}
+            </Text>
+          )}
+
+          {item.file && (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => onImagePress(item.file!)}
+              className="mt-2"
+            >
+              <Image
+                source={{ uri: item.file }}
+                className="w-full rounded-xl"
+                style={{ aspectRatio: 1 }}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  }
+);
+
 MessageItem.displayName = "MessageItem";
+
 
 const ChatScreen = () => {
   const { roomId, receiverName, receiverImage } = useLocalSearchParams<{
@@ -50,6 +139,9 @@ const ChatScreen = () => {
   const [message, setMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([]);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewVisible, setPreviewVisible] = useState(false);
+
 
   // DYNAMIC USER ID
   const { customerProfile } = useUser()
@@ -101,6 +193,11 @@ const ChatScreen = () => {
       setSelectedImage(result.assets[0].uri);
     }
   };
+  const handleImagePress = (uri: string) => {
+    setPreviewImage(uri);
+    setPreviewVisible(true);
+  };
+
 
   // SEND LOGIC (Fixed Network Error)
   const handleSendMessage = async () => {
@@ -171,7 +268,12 @@ const ChatScreen = () => {
           data={mergedMessages}
           inverted
           keyExtractor={(item) => `msg-${item.id}`}
-          renderItem={({ item }) => <MessageItem item={item} myUserId={MY_USER_ID as number} />}
+          renderItem={({ item }) =>
+            <MessageItem
+              item={item}
+              myUserId={MY_USER_ID as number}
+              onImagePress={handleImagePress}
+            />}
           contentContainerStyle={{ padding: 10 }}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
@@ -215,6 +317,12 @@ const ChatScreen = () => {
           </View>
         </View>
       </KeyboardAvoidingView>
+      <ImageViewer
+        visible={previewVisible}
+        uri={previewImage}
+        onClose={() => setPreviewVisible(false)}
+      />
+
     </SafeAreaView>
   );
 };
