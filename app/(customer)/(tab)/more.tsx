@@ -46,6 +46,12 @@ const menuItems: MenuItem[] = [
         title: "FAQ",
         link: "/(customer)/more/faq" as Href,
     },
+    {
+        id: 5,
+        icon: "help-circle-outline",
+        title: "Payment Options",
+        link: "/(customer)/more/payment" as Href,
+    },
 ];
 
 /** ---- Legal submenu items ---- */
