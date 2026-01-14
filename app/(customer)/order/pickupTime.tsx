@@ -1,5 +1,6 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker, {
     DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -30,6 +31,42 @@ export default function PlaceOrderScreen() {
         if (selected) setTime(selected);
         if (Platform.OS === "android") setShowTimePicker(false);
     };
+
+    const handleContinue = async () => {
+        try {
+            let pickup_time: string | null = null;
+
+            if (selectedOption === "later") {
+                // Merge date + time
+                const combinedDate = new Date(
+                    date.getFullYear(),
+                    date.getMonth(),
+                    date.getDate(),
+                    time.getHours(),
+                    time.getMinutes(),
+                    time.getSeconds(),
+                    time.getMilliseconds()
+                );
+
+                pickup_time = combinedDate.toISOString();
+                // 👉 "2026-01-14T09:51:08.982Z"
+            }
+
+            const data = {
+                pickup_time,
+            };
+
+            await AsyncStorage.setItem(
+                "order-details",
+                JSON.stringify(data)
+            );
+
+            router.push("/order/pickupAddress");
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
 
     return (
         <View className="flex-1 bg-white pt-5">
@@ -162,7 +199,7 @@ export default function PlaceOrderScreen() {
             </ScrollView>
 
             {/* Fixed Continue Button at Bottom */}
-            <TouchableOpacity onPress={() => router.push("/order/pickupAddress")} className="absolute bottom-10 left-5 right-5">
+            <TouchableOpacity onPress={handleContinue} className="absolute bottom-10 left-5 right-5">
                 <PrimaryButton text="Continue" />
             </TouchableOpacity>
         </View>

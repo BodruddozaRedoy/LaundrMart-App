@@ -44,7 +44,7 @@ export default function SlideToOrder() {
         // Navigate right away
         setTimeout(() => {
             if (!isMounted.current) return;
-            router.push("/(customer)/order/placeOrder");
+            router.push("/(customer)/order/pickupTime");
         }, 1000);
     }, []);
 

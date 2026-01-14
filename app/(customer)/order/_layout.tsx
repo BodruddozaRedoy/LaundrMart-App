@@ -8,8 +8,8 @@ export default function OrderLayout() {
 
     // Map last segment to readable title
     const titleMap: Record<string, string> = {
-        placeOrder: "Place Order",
-        pickupAddress: "Pickup Now",
+        pickupTime: "Pickup Time",
+        pickupAddress: "Pickup Address",
         addNewAddress: "Add Location",
         chooseLaundryMart: "Choose Laundry Mart",
         laundryDetails: "Laundry Details",

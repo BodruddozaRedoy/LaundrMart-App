@@ -1,9 +1,10 @@
 import LaundryCard from "@/components/common/LaundryCard";
 import { api } from "@/lib/axios";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -62,6 +63,15 @@ export default function ChooseLaundryMartScreen() {
       },
     });
   };
+
+  useEffect(() => {
+    const loadAddresses = async () => {
+      const orderDetails = await AsyncStorage.getItem("order-details");
+      console.log("orderdetails", orderDetails)
+
+    };
+    loadAddresses();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-white px-5">
