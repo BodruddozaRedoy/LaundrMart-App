@@ -159,7 +159,7 @@ export default function LaundryDetailsScreen() {
             {/* Sticky Book Now Button */}
             <View className="absolute bottom-0 left-0 right-0 bg-white p-5 border-t border-gray-100">
                 <TouchableOpacity
-                    onPress={() => { router.push({ pathname: "/order/bookNow", params: { id: params.store_id } }); handleBookNow() }}
+                    onPress={() => { router.push({ pathname: "/order/bookNow", params: params }); handleBookNow() }}
                     activeOpacity={0.8}
                 >
                     <PrimaryButton text="Book Now" />

@@ -64,7 +64,7 @@ export default function ChooseLaundryMartScreen() {
     });
   };
 
-  console.log(JSON.stringify(data, null, 2))
+  // console.log(JSON.stringify(data, null, 2))
 
   useEffect(() => {
     const loadAddresses = async () => {

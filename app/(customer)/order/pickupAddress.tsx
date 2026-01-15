@@ -60,6 +60,45 @@ const PickupNowScreen = () => {
         setEditModalVisible(true);
     };
 
+    const handleDeleteAddress = async (addr: any) => {
+        Alert.alert(
+            "Delete Address",
+            "Are you sure you want to delete this address?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const updatedList = addresses.filter(
+                                (a) => a.id !== addr.id
+                            );
+
+                            await AsyncStorage.setItem(
+                                "savedAddresses",
+                                JSON.stringify(updatedList)
+                            );
+
+                            setAddresses(updatedList);
+
+                            // ⭐ if deleted address was selected
+                            if (selectedAddress?.id === addr.id) {
+                                setSelectedAddress(
+                                    updatedList.length > 0 ? updatedList[0] : null
+                                );
+                            }
+                        } catch (e) {
+                            console.error("Delete error:", e);
+                            Alert.alert("Error", "Unable to delete address.");
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
+
     // ⭐ new: save updated address string to AsyncStorage
     const handleUpdateAddress = async () => {
         if (!addressToEdit) return;
@@ -108,7 +147,9 @@ const PickupNowScreen = () => {
 
             const updatedOrderDetails = {
                 ...parsedPrev,          // keep pickup_time
-                pickup_address: addressPayload // add address
+                pickup_address: addressPayload, // add address
+                latitude: selectedAddress.latitude.toString(),
+                longitude: selectedAddress.longitude.toString(),
             };
 
             await AsyncStorage.setItem(
@@ -168,14 +209,20 @@ const PickupNowScreen = () => {
                     <Ionicons name="create-outline" size={18} color="#017FC6" />
                 </TouchableOpacity> */}
 
-                        {selectedAddress?.id === item.id && (
+                        {/* {selectedAddress?.id === item.id && (
                             <Ionicons
                                 name="checkmark-circle"
                                 size={24}
                                 color="#017FC6"
                                 style={{ marginLeft: 5 }}
                             />
-                        )}
+                        )} */}
+                        <TouchableOpacity
+                            onPress={() => handleDeleteAddress(item)}
+                            className="bg-red-50 px-2 py-2 ml-2 rounded-full"
+                        >
+                            <Ionicons name="trash-outline" size={18} color="#DC2626" />
+                        </TouchableOpacity>
                     </View>
                 )}
                 ListEmptyComponent={

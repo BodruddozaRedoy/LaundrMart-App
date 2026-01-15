@@ -3,7 +3,7 @@ import { laundries } from "@/constants";
 import { api } from "@/lib/axios";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
@@ -17,17 +17,21 @@ import {
 } from "react-native";
 
 export default function BookNowScreen() {
-    const { id } = useLocalSearchParams();
+    const params = useLocalSearchParams();
+    const martData = params as any;
+    // console.log("params", martData);
+
 
     // Memoize the laundry lookup to prevent re-calculations during render
     const laundry = useMemo(() => {
-        return laundries.find((item) => item.id === id) || laundries[0];
-    }, [id]);
+        return laundries.find((item) => item.id === params.id) || laundries[0];
+    }, [params.id]);
 
     const [bagCounts, setBagCounts] = useState({ small: 0, medium: 0, large: 0 });
     const [selectedService, setSelectedService] = useState<"full_service" | "drop_off" | "pickup">("full_service");
     const [selectedInsurance, setSelectedInsurance] = useState<"basic" | "protection">("basic");
     const [instructions, setInstructions] = useState("");
+    const [activeAlert, setActiveAlert] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [order, setOrder] = useState({
         street_address: "",
@@ -37,19 +41,36 @@ export default function BookNowScreen() {
         country: ""
     })
 
+
+
+
     // Tooltip visibility
-    const [activeAlert, setActiveAlert] = useState<string | null>(null);
+
     useEffect(() => {
         const loadOrder = async () => {
             try {
-                const orderDetails = await AsyncStorage.getItem("order-details");
-                console.log(JSON.stringify(orderDetails, null, 2))
+                const raw = await AsyncStorage.getItem("order-details");
+                if (!raw) return;
+
+                const parsed = JSON.parse(raw);
+
+                const normalize = (val: any) =>
+                    typeof val === "string" ? JSON.parse(val) : val;
+
+                setOrder({
+                    ...normalize(parsed.pickup_address),
+                });
+
+                console.log("ORDER DETAILS →", parsed);
             } catch (error) {
-                console.log(error)
+                console.log("Order parse error:", error);
             }
-        }
-        loadOrder()
-    }, [])
+        };
+
+        loadOrder();
+    }, []);
+    console.log(JSON.stringify(order))
+
 
 
     const updateBagCount = (type: keyof typeof bagCounts, delta: number) => {
@@ -66,67 +87,100 @@ export default function BookNowScreen() {
             return;
         }
 
-        const orderData = {
-            laundryId: laundry.id,
-            bags: bagCounts,
-            service: selectedService,
-            insurance: selectedInsurance,
-            specialInstructions: instructions,
-            timestamp: new Date().toISOString(),
-        };
-
-        const payload = {
-            service_type: selectedService,
-
-            pickup_address: {
-                street_address: ["20 W 34th St", "Floor 2"],
-                state: "NY",
-                city: "New York",
-                zip_code: "10001",
-                country: "US",
-            },
-
-            dropoff_address: {
-                street_address: ["285 Fulton St", ""],
-                state: "NY",
-                city: "New York",
-                zip_code: "10006",
-                country: "US",
-            },
-
-            pickup_latitude: 40.74865,
-            pickup_longitude: -73.9853,
-
-            dropoff_latitude: 40.71274,
-            dropoff_longitude: -74.01338,
-
-            insurance_amount: 0,
-
-            customer_note: "string",
-            pickup_phone_number: "+8801853958635",
-            dropoff_phone_number: "+8801853958636",
-
-            manifest_total_value: 1000,
-            external_store_id: "ed339532-acf4-4f49-85b4-2040da57a047",
-        };
-
-
-        const res = await api.post("/customers/api/get-quote", payload)
-
         setLoading(true);
-        try {
-            // Simulate API Call - Replace with your fetch/axios logic
-            console.log("Submitting Order:", orderData);
-            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            await AsyncStorage.setItem("pending-order", JSON.stringify(orderData));
-            router.push({ pathname: "/order/reviewOrder", params: { id: laundry?.id } });
-        } catch (error) {
-            Alert.alert("Error", "Something went wrong. Please try again.");
+        try {
+            /* ----------------------------------
+               1. Load order-details from storage
+            -----------------------------------*/
+            const rawOrder = await AsyncStorage.getItem("order-details");
+            if (!rawOrder) {
+                Alert.alert("Missing Data", "Pickup address not found.");
+                return;
+            }
+
+            const orderDetails = JSON.parse(rawOrder);
+
+            const normalize = (val: any) =>
+                typeof val === "string" ? JSON.parse(val) : val;
+            const normalizeToString = (addr: any) => {
+                if (!addr) return null;
+                // if already string → keep it
+                if (typeof addr === "string") return addr;
+                // if object → stringify
+                return JSON.stringify(addr);
+            };
+
+
+            // const pickupAddress = normalize(orderDetails.pickup_address);
+            const pickupAddressStr = normalizeToString(orderDetails.pickup_address);
+            const dropoffAddressStr = normalizeToString(orderDetails.dropoff_address);
+
+            /* ----------------------------------
+               2. Parse LaundryMart (dropoff)
+            -----------------------------------*/
+            const mart = params as any;
+
+            const dropoffAddress =
+                typeof mart.location === "string"
+                    ? JSON.parse(mart.location)
+                    : mart.location;
+
+            /* ----------------------------------
+               3. Build Get-Quote Payload
+            -----------------------------------*/
+            const payload = {
+                service_type: selectedService,
+
+                pickup_address: pickupAddressStr,
+                dropoff_address: dropoffAddressStr,
+
+                pickup_latitude: Number(orderDetails.latitude),
+                pickup_longitude: Number(orderDetails.longitude),
+
+                dropoff_latitude: Number(mart.lat),
+                dropoff_longitude: Number(mart.lng),
+
+                insurance_amount: selectedInsurance === "protection" ? 299 : 0,
+
+                customer_note: instructions || "",
+                pickup_phone_number: "+8801853958635",
+                dropoff_phone_number: "+8801853958636",
+
+                manifest_total_value: 1000,
+                external_store_id: mart.store_id,
+            };
+
+            /* ----------------------------------
+               4. Call Get-Quote API
+            -----------------------------------*/
+            const res = await api.post("/customers/api/get-quote", payload);
+            console.log("QUOTE RESPONSE →", res.data);
+
+            /* ----------------------------------
+               5. Save order + quote
+            -----------------------------------*/
+            await AsyncStorage.setItem(
+                "pending-order",
+                JSON.stringify({
+                    bags: bagCounts,
+                    service: selectedService,
+                    insurance: selectedInsurance,
+                    instructions,
+                    payload,
+                    quote: res.data,
+                })
+            );
+
+            // router.push("/order/reviewOrder");
+        } catch (error: any) {
+            console.error("ORDER ERROR:", error?.response?.data);
+            Alert.alert("Error", "Unable to get quote. Please try again.");
         } finally {
             setLoading(false);
         }
     };
+
 
     // Helper for bag images sizes to keep class strings clean
     const getBagSizeClass = (label: string) => {
