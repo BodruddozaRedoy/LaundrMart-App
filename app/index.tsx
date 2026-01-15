@@ -1,19 +1,23 @@
 import { RedirectionProvider } from "@/context/RedirectionContext";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // To check if the user is logged in
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect } from "expo-router";
 import React from "react";
-import { StatusBar, useColorScheme } from "react-native";
+import {
+    ActivityIndicator,
+    StatusBar,
+    Text,
+    useColorScheme,
+    View,
+} from "react-native";
 
 export default function Index() {
     const theme = useColorScheme();
+    const [isLoggedIn, setIsLoggedIn] = React.useState<boolean | null>(null);
 
     const checkLoginStatus = async () => {
-        // Check if access token is stored (this assumes you're saving the token in AsyncStorage)
-        const token = await AsyncStorage.getItem('accessToken');
-        return token !== null;
-    };
-
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+      const token = await AsyncStorage.getItem("accessToken");
+      return token !== null;
+  };
 
     React.useEffect(() => {
         const checkStatus = async () => {
@@ -21,26 +25,38 @@ export default function Index() {
             setIsLoggedIn(loggedIn);
         };
 
-        checkStatus();
-    }, []);
+      checkStatus();
+  }, []);
 
+    // ✅ Loading screen while checking auth
+    if (isLoggedIn === null) {
     return (
-        <>
-            <RedirectionProvider>
-                {/* Status bar ALWAYS renders */}
+            <View className="flex-1 items-center justify-center bg-white">
+                <ActivityIndicator size="large" color="#017FC6" />
+                <Text className="mt-3 text-gray-600 text-sm">
+                    Checking session...
+                </Text>
                 <StatusBar
-                    translucent={false}
-                    backgroundColor={theme === "dark" ? "#000" : "#fff"}
+                    backgroundColor="#fff"
                     barStyle={theme === "dark" ? "light-content" : "dark-content"}
                 />
+            </View>
+        );
+    }
 
-                {/* Redirect based on login status */}
-                {!isLoggedIn ? (
-                    <Redirect href="/(auth)/welcome" /> // Redirect to welcome if not logged in
-                ) : (
-                    <Redirect href="/(customer)/(tab)" /> // Redirect to customer tab if logged in
-                )}
-            </RedirectionProvider>
-        </>
-    );
+    return (
+        <RedirectionProvider>
+          <StatusBar
+              translucent={false}
+              backgroundColor={theme === "dark" ? "#000" : "#fff"}
+              barStyle={theme === "dark" ? "light-content" : "dark-content"}
+          />
+
+          {isLoggedIn ? (
+              <Redirect href="/(customer)/(tab)" />
+          ) : (
+              <Redirect href="/(auth)/welcome" />
+          )}
+      </RedirectionProvider>
+  );
 }

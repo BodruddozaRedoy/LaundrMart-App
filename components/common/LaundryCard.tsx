@@ -43,10 +43,12 @@ const LaundryCard = ({ item }: { item: any }) => {
         >
             <View className="flex-row items-center">
                 {/* Image with fallback */}
-                <Image
-                    source={{ uri: item.image || 'https://via.placeholder.com/150' }}
-                    className="w-16 h-16 rounded-2xl mr-3 bg-gray-100"
-                />
+                <View className='bg-gray-100 mr-3 p-3 rounded-lg'>
+                    <Image
+                        source={{ uri: item.laundrymart_logo || 'https://via.placeholder.com/150' }}
+                        className="w-12 h-12 rounded-2xl"
+                    />
+                </View>
 
                 <View className="flex-1">
                     <View className="flex-row justify-between items-center">

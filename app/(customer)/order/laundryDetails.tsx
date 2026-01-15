@@ -1,5 +1,6 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
@@ -43,6 +44,26 @@ export default function LaundryDetailsScreen() {
 
     const [showHoursModal, setShowHoursModal] = useState(false);
     const [showInfoAlert, setShowInfoAlert] = useState(false);
+
+    const handleBookNow = async () => {
+        try {
+            const prev = await AsyncStorage.getItem("order-details");
+            const parsedPrev = prev ? JSON.parse(prev) : {};
+
+
+            const updatedOrderDetails = {
+                ...parsedPrev,          // keep pickup_time
+                dropoff_address: params.location  // add address
+            };
+            await AsyncStorage.setItem(
+                "order-details",
+                JSON.stringify(updatedOrderDetails)
+            );
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <View className="flex-1 bg-white">
@@ -138,7 +159,7 @@ export default function LaundryDetailsScreen() {
             {/* Sticky Book Now Button */}
             <View className="absolute bottom-0 left-0 right-0 bg-white p-5 border-t border-gray-100">
                 <TouchableOpacity
-                    onPress={() => router.push({ pathname: "/order/bookNow", params: { id: params.store_id } })}
+                    onPress={() => { router.push({ pathname: "/order/bookNow", params: { id: params.store_id } }); handleBookNow() }}
                     activeOpacity={0.8}
                 >
                     <PrimaryButton text="Book Now" />

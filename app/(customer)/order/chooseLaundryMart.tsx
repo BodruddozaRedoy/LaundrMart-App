@@ -59,15 +59,17 @@ export default function ChooseLaundryMartScreen() {
         image: vendor.image,
         rating: vendor.average_rating,
         location: vendor.location,
-        is_open: vendor.is_open_now ? "true" : "false"
+        is_open: vendor.is_open_now ? "true" : "false",
       },
     });
   };
 
+  console.log(JSON.stringify(data, null, 2))
+
   useEffect(() => {
     const loadAddresses = async () => {
       const orderDetails = await AsyncStorage.getItem("order-details");
-      console.log("orderdetails", orderDetails)
+      // console.log("orderdetails", orderDetails)
 
     };
     loadAddresses();

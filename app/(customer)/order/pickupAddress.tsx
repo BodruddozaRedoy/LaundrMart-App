@@ -20,6 +20,8 @@ const PickupNowScreen = () => {
         currentAddress: string;
     }>();
 
+    console.log(latitude, longitude)
+
     const [addresses, setAddresses] = useState<any[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<any>(null);
 
@@ -106,7 +108,7 @@ const PickupNowScreen = () => {
 
             const updatedOrderDetails = {
                 ...parsedPrev,          // keep pickup_time
-                address: addressPayload // add address
+                pickup_address: addressPayload // add address
             };
 
             await AsyncStorage.setItem(
