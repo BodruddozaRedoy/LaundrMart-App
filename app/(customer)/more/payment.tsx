@@ -37,6 +37,7 @@ export default function PaymentScreen() {
             setLoading(false);
         }
     };
+    console.log(paymentMethods)
 
     useEffect(() => { fetchPaymentMethods(); }, []);
 
@@ -157,7 +158,7 @@ export default function PaymentScreen() {
                                 </View>
 
                                 {/* Set Default Option */}
-                                {!item.is_default && (
+                                {/* {!item.is_default && (
                                     <TouchableOpacity
                                         onPress={() => handleSetDefault(item.id)}
                                         className="mt-4 pt-3 border-t border-gray-200"
@@ -169,7 +170,7 @@ export default function PaymentScreen() {
                                             <Text className="text-blue-600 font-semibold text-center">Set as Default</Text>
                                         )}
                                     </TouchableOpacity>
-                                )}
+                                )} */}
                             </View>
                         ))
                     )}

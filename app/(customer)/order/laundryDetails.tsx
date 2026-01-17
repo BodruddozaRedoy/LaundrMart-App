@@ -53,7 +53,12 @@ export default function LaundryDetailsScreen() {
 
             const updatedOrderDetails = {
                 ...parsedPrev,          // keep pickup_time
-                dropoff_address: params.location  // add address
+                dropoff_address: params.location,
+                shopName: params.laundrymart_name,
+                ratings: params.average_rating,  // add address
+                distance: params.distance,  // add address
+                image: params.image,
+                price: params.price_per_pound
             };
             await AsyncStorage.setItem(
                 "order-details",

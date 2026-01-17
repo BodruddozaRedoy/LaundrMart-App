@@ -13,10 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SORT_OPTIONS = [
-  { label: "Rating", value: "-average_rating" },
+  { label: "Rating", value: "average_rating" },
   { label: "Distance", value: "distance" },
   { label: "Price", value: "price_per_pound" },
 ];
@@ -26,36 +26,51 @@ export default function ChooseLaundryMartScreen() {
   const params = useLocalSearchParams();
 
   const [search, setSearch] = useState("");
-  const [ordering, setOrdering] = useState("-average_rating");
+  const insets = useSafeAreaInsets()
+  const [ordering, setOrdering] = useState("average_rating");
 
   // ⭐ NEW: mode state
   const [mode, setMode] = useState<"all" | "choose">("all");
+
+  console.log(params)
 
   /* ---------------- ALL VENDORS ---------------- */
   const {
     data: vendorsData,
     isLoading: vendorsLoading,
+    refetch: refetchVendors,
+    isFetching: isFetchingVendors,
   } = useQuery({
     queryKey: ["vendors", search, ordering, params.latitude, params.longitude],
     enabled: mode === "all",
     queryFn: async () => {
+      const queryParams: Record<string, any> = {
+        page_size: 10,
+      };
+
+      if (ordering) queryParams.ordering = ordering;
+      if (search.trim().length > 0) queryParams.search = search.trim();
+      if (params.latitude) queryParams.lat = params.latitude;
+      if (params.longitude) queryParams.lng = params.longitude;
+
       const res = await api.get("/customers/api/vendors", {
-        params: {
-          lat: params.latitude,
-          lng: params.longitude,
-          ordering,
-          search,
-          page_size: 10,
-        },
+        params: queryParams,
       });
+
       return res.data;
     },
   });
+
+
+
+  // console.log("vendorsData", JSON.stringify(vendorsData, null, 2))
 
   /* ---------------- CHOOSE FOR ME ---------------- */
   const {
     data: chooseData,
     isLoading: chooseLoading,
+    refetch: refetchChoose,
+    isFetching: isFetchingChoose,
   } = useQuery({
     queryKey: ["choose-for-me"],
     enabled: mode === "choose",
@@ -65,8 +80,9 @@ export default function ChooseLaundryMartScreen() {
     },
   });
 
+
   const listData =
-    mode === "choose" ? chooseData ?? [] : vendorsData?.results ?? [];
+    mode === "choose" ? chooseData ?? [] : vendorsData ?? [];
 
   const isLoading = mode === "choose" ? chooseLoading : vendorsLoading;
 
@@ -76,6 +92,19 @@ export default function ChooseLaundryMartScreen() {
     };
     loadOrderDetails();
   }, []);
+
+  const onRefresh = () => {
+    if (mode === "choose") {
+      refetchChoose();
+    } else {
+      refetchVendors();
+    }
+  };
+
+  const refreshing =
+    mode === "choose" ? isFetchingChoose : isFetchingVendors;
+
+
 
   return (
     <SafeAreaView className="flex-1 bg-white px-5">
@@ -132,6 +161,8 @@ export default function ChooseLaundryMartScreen() {
             renderItem={({ item }) => <LaundryCard item={item} />}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 90 }}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             ListEmptyComponent={
             <View className="mt-20 items-center">
               <Text className="text-gray-400">No vendors available.</Text>
@@ -146,6 +177,7 @@ export default function ChooseLaundryMartScreen() {
           onPress={() =>
             setMode((prev) => (prev === "all" ? "choose" : "all"))
           }
+          style={{ marginBottom: insets.bottom }}
           className={`h-12 rounded-xl items-center justify-center ${mode === "choose" ? "bg-gray-200" : "bg-[#017FC6]"
             }`}
         >

@@ -175,7 +175,7 @@ const PickupNowScreen = () => {
                               {item.type}
                           </Text>
                           <Text className="text-md text-gray-600 mt-1">
-                              {`${JSON.parse(item.location).street_address}, ${JSON.parse(item.location).city}`}
+                                {`${JSON.parse(item.location).street_address}, ${JSON.parse(item.location).city}, ${JSON.parse(item.location).state}, ${JSON.parse(item.location).country}`}
                           </Text>
                       </TouchableOpacity>
 

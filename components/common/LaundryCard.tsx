@@ -15,7 +15,7 @@ const LaundryCard = ({ item }: { item: any }) => {
 
     // FIX: Safe check for distance (solves your toFixed error)
     const distance = (item.distance !== null && typeof item.distance === 'number')
-        ? `${item.distance.toFixed(1)} km`
+        ? `${item.distance.toFixed(1)} mile`
         : "Nearby";
 
     const price = item.price_per_pound ? `$${item.price_per_pound}` : "N/A";
