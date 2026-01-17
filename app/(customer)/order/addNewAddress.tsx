@@ -1,7 +1,8 @@
 // app/order/add-new-address.tsx (or your path)
+import { api } from "@/lib/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -14,12 +15,13 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 const { width, height } = Dimensions.get("window");
 
 export default function AddNewAddress() {
     const router = useRouter();
+    const params = useLocalSearchParams()
     const [region, setRegion] = useState<Region | null>(null);
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
@@ -112,7 +114,55 @@ export default function AddNewAddress() {
                     .join(", ") ||
                 `${region.latitude.toFixed(6)}, ${region.longitude.toFixed(6)}`;
 
-            setModalVisible(true);
+
+            if (!params.type) {
+                setModalVisible(true);
+
+            } else {
+                if (params.type === "Home" || params.type === "home") {
+                    try {
+                        const res = await api.patch("/accounts/api/customer-profile", {
+                            location: {
+                                street_address: streetLines,
+                                state: place?.region,
+                                city: place?.city,
+                                zip_code: place?.postalCode,
+                                country: place?.isoCountryCode || place?.country || "",
+                            },
+                            lat: region.latitude,
+                            lng: region.longitude,
+                        })
+                        if (params.path === "profile") {
+                            router.replace("/(customer)/more/profileInfo")
+                        } else {
+                            router.replace("/(customer)/order/pickupAddress")
+                        }
+                        console.log(res.data)
+                    } catch (error) {
+                        console.log(error)
+                    }
+
+                } else {
+                    try {
+                        const res = await api.patch(`/customers/api/location/${params.id}`, {
+                            type: params.type,
+                            lat: region.latitude,
+                            lng: region.longitude,
+                            location: {
+                                street_address: streetLines,
+                                state: place?.region,
+                                city: place?.city,
+                                zip_code: place?.postalCode,
+                                country: place?.isoCountryCode || place?.country || "",
+                            }
+                        })
+                        router.replace("/(customer)/order/pickupAddress")
+                        console.log(res.data)
+                    } catch (error: any) {
+                        console.log(error?.response?.data)
+                    }
+                }
+            }
 
             await AsyncStorage.setItem(
                 "pendingAddress",
@@ -156,6 +206,46 @@ export default function AddNewAddress() {
                 id: Date.now().toString(),
             };
 
+            console.log("finalAddress", finalAddress)
+
+            if (finalAddress.label === "Home") {
+                try {
+                    const res = await api.patch("/accounts/api/customer-profile", {
+                        location: {
+                            street_address: finalAddress.street_address,
+                            state: finalAddress.state,
+                            city: finalAddress.city,
+                            zip_code: finalAddress.zip_code,
+                            country: finalAddress.country
+                        },
+                        lat: finalAddress.latitude,
+                        lng: finalAddress.longitude
+                    })
+                    console.log(res.data)
+                } catch (error) {
+                    console.log(error)
+                }
+
+            } else {
+                try {
+                    const res = await api.post("/customers/api/locations", {
+                        type: finalAddress.label,
+                        lat: finalAddress.latitude,
+                        lng: finalAddress.longitude,
+                        location: {
+                            street_address: finalAddress.street_address,
+                            state: finalAddress.state,
+                            city: finalAddress.city,
+                            zip_code: finalAddress.zip_code,
+                            country: finalAddress.country
+                        }
+                    })
+                    console.log(res.data)
+                } catch (error: any) {
+                    console.log(error?.response?.data)
+                }
+            }
+
             const existing = await AsyncStorage.getItem("savedAddresses");
             const addresses = existing ? JSON.parse(existing) : [];
             addresses.push(finalAddress);
@@ -165,7 +255,7 @@ export default function AddNewAddress() {
 
             setModalVisible(false);
 
-            router.push({
+            router.replace({
                 pathname: "/order/pickupAddress",
                 params: {
                     latitude: String(addressData.latitude),

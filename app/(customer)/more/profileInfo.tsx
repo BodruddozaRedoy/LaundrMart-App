@@ -8,11 +8,18 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 const PersonalInfoScreen = () => {
-    const { customerProfile, updateProfile, updateProfileState } = useUser();
+    const {
+        customerProfile,
+        updateProfile,
+        updateProfileState,
+        refetchProfile,
+        isProfileFetching,
+    } = useUser();
+
     const { success, error } = useToast();
 
     // ---------------- STATES ----------------
@@ -20,6 +27,7 @@ const PersonalInfoScreen = () => {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [location, setLocation] = useState("");
+
 
     const [image, setImage] = useState<null | {
         uri: string;
@@ -33,7 +41,9 @@ const PersonalInfoScreen = () => {
             setFullName(customerProfile.full_name || "");
             setEmail(customerProfile.email || "");
             setPhone(customerProfile.phone_number || "");
-            setLocation(customerProfile.location || "");
+            const parsed = JSON.parse(customerProfile.location!);
+            const updatedLocation = `${parsed.street_address}, ${parsed.city}, ${parsed.state}, ${parsed.country}`
+            setLocation(updatedLocation || "");
         }
     }, [customerProfile]);
 
@@ -96,12 +106,23 @@ const PersonalInfoScreen = () => {
         }
     };
 
+
+    const onRefresh = useCallback(async () => {
+        try {
+            await refetchProfile();
+            success("Updated", "Latest profile data loaded");
+        } catch (e) {
+            error("Refresh failed", "Could not fetch latest data");
+        }
+    }, []);
+
     return (
         <ScreenWrapper
             scrollable
             keyboardAvoiding
             loading={updateProfileState.isPending}
-            refreshing
+            refreshing={isProfileFetching}
+            onRefresh={onRefresh}
         >
             {/* Header */}
             <View className="flex-row items-center mb-6 mt-4">
@@ -164,6 +185,7 @@ const PersonalInfoScreen = () => {
                     <TextInput
                         value={email}
                         onChangeText={setEmail}
+                        readOnly
                         autoCapitalize="none"
                         keyboardType="email-address"
                         className="flex-1"
@@ -186,7 +208,12 @@ const PersonalInfoScreen = () => {
                         placeholder="Your location"
                         className="flex-1 text-gray-700"
                     />
-                    <Ionicons name="location-outline" size={18} color="#007AFF" />
+                    <TouchableOpacity
+                        onPress={() => router.push({ pathname: "/(customer)/order/addNewAddress", params: { type: "Home", path: "profile" } })}
+                        className="bg-gray-100 px-3 py-2 rounded-lg"
+                    >
+                        <Ionicons name="create-outline" size={18} color="#017FC6" />
+                    </TouchableOpacity>
                 </View>
             </View>
 

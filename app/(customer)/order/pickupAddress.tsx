@@ -1,175 +1,152 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
+import { api } from "@/lib/axios";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
     FlatList,
-    Modal,
     Text,
-    TextInput,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 const PickupNowScreen = () => {
+    const queryClient = useQueryClient();
+
     const { latitude, longitude, currentAddress } = useLocalSearchParams<{
         latitude: string;
         longitude: string;
         currentAddress: string;
     }>();
 
-    console.log(latitude, longitude)
-
-    const [addresses, setAddresses] = useState<any[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<any>(null);
 
-    // ⭐ new states for update flow
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editAddressValue, setEditAddressValue] = useState("");
     const [addressToEdit, setAddressToEdit] = useState<any>(null);
 
+    const { data: addresses = [] } = useQuery({
+        queryKey: ["address"],
+        queryFn: async () => {
+            const res = await api.get("/customers/api/locations");
+            return res.data ?? [];
+        },
+    });
+
     useEffect(() => {
-        const loadAddresses = async () => {
-            const saved = await AsyncStorage.getItem("savedAddresses");
-            const orderDetails = await AsyncStorage.getItem("order-details");
-
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                setAddresses(parsed);
-
-                // ⭐ AUTO select first address if exists
-                if (parsed.length > 0) {
-                    setSelectedAddress(parsed[0]);
-                }
-            }
-        };
-        loadAddresses();
-    }, []);
-
+        if (addresses.length > 0 && !selectedAddress) {
+            setSelectedAddress(addresses[0]);
+        }
+    }, [addresses]);
 
     const handleSelect = (addr: any) => {
         setSelectedAddress(addr);
     };
 
-    // ⭐ new: open modal to edit address
-    const handleEdit = (addr: any) => {
-        setAddressToEdit(addr);
-        setEditAddressValue(addr.currentAddress);
-        setEditModalVisible(true);
+    const handleEdit = (type: string, id: any) => {
+        router.push({
+            pathname: "/(customer)/order/addNewAddress",
+            params: { type, id },
+        });
     };
 
-    const handleDeleteAddress = async (addr: any) => {
-        Alert.alert(
-            "Delete Address",
-            "Are you sure you want to delete this address?",
-            [
-                { text: "Cancel", style: "cancel" },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: async () => {
-                        try {
-                            const updatedList = addresses.filter(
-                                (a) => a.id !== addr.id
-                            );
+    // ✅ INSTANT DELETE (optimistic)
+    const handleDeleteAddress = async (id: any) => {
+        const prevAddresses = queryClient.getQueryData<any[]>(["address"]);
 
-                            await AsyncStorage.setItem(
-                                "savedAddresses",
-                                JSON.stringify(updatedList)
-                            );
-
-                            setAddresses(updatedList);
-
-                            // ⭐ if deleted address was selected
-                            if (selectedAddress?.id === addr.id) {
-                                setSelectedAddress(
-                                    updatedList.length > 0 ? updatedList[0] : null
-                                );
-                            }
-                        } catch (e) {
-                            console.error("Delete error:", e);
-                            Alert.alert("Error", "Unable to delete address.");
-                        }
-                    },
-                },
-            ]
+        // Optimistic UI update
+        queryClient.setQueryData(["address"], (old: any[]) =>
+            old.filter((a) => a.id !== id)
         );
+
+        if (selectedAddress?.id === id) {
+            setSelectedAddress(null);
+        }
+
+        try {
+            await api.delete(`/customers/api/location/${id}`);
+
+            Toast.show({
+                type: "success",
+                text1: "Address deleted",
+                text2: "Pickup location removed successfully",
+            });
+      } catch (e) {
+          // rollback
+          queryClient.setQueryData(["address"], prevAddresses);
+
+          Toast.show({
+              type: "error",
+              text1: "Delete failed",
+              text2: "Something went wrong",
+          });
+      }
     };
 
-
-    // ⭐ new: save updated address string to AsyncStorage
+    // ✅ INSTANT UPDATE
     const handleUpdateAddress = async () => {
         if (!addressToEdit) return;
 
-        try {
-            const updatedList = addresses.map((a) =>
+        queryClient.setQueryData(["address"], (old: any[]) =>
+            old.map((a) =>
                 a.id === addressToEdit.id
                     ? { ...a, currentAddress: editAddressValue }
                     : a
-            );
+          )
+      );
 
-            await AsyncStorage.setItem("savedAddresses", JSON.stringify(updatedList));
-            setAddresses(updatedList);
-
-            // if this address was selected, update selected reference too
-            if (selectedAddress?.id === addressToEdit.id) {
-                setSelectedAddress({
-                    ...selectedAddress,
-                    currentAddress: editAddressValue,
-                });
-            }
-
-            setEditModalVisible(false);
-            Alert.alert("Updated!", "Address updated successfully.");
-        } catch (e) {
-            console.error("Update error:", e);
-            Alert.alert("Error", "Unable to update address.");
+        if (selectedAddress?.id === addressToEdit.id) {
+            setSelectedAddress({
+                ...selectedAddress,
+                currentAddress: editAddressValue,
+            });
         }
+
+        setEditModalVisible(false);
+
+        Toast.show({
+            type: "success",
+            text1: "Address updated",
+            text2: "Pickup location updated successfully",
+        });
     };
 
     const handleContinue = async () => {
         if (!selectedAddress) return;
 
-        try {
-            const prev = await AsyncStorage.getItem("order-details");
-            const parsedPrev = prev ? JSON.parse(prev) : {};
+        const prev = await AsyncStorage.getItem("order-details");
+        const parsedPrev = prev ? JSON.parse(prev) : {};
 
-            // ⭐ Uber address format
-            const addressPayload = {
-                street_address: [selectedAddress.currentAddress],
-                state: selectedAddress.state || "",
-                city: selectedAddress.city || "",
-                zip_code: selectedAddress.zip_code || "",
-                country: selectedAddress.country || "US",
-            };
+        const addressPayload = {
+          street_address: selectedAddress.street_address,
+          state: selectedAddress.state || "",
+          city: selectedAddress.city || "",
+          zip_code: selectedAddress.zip_code || "",
+          country: selectedAddress.country || "US",
+      };
 
-            const updatedOrderDetails = {
-                ...parsedPrev,          // keep pickup_time
-                pickup_address: addressPayload, // add address
+        await AsyncStorage.setItem(
+            "order-details",
+            JSON.stringify({
+                ...parsedPrev,
+                pickup_address: addressPayload,
                 latitude: selectedAddress.latitude.toString(),
                 longitude: selectedAddress.longitude.toString(),
-            };
+          })
+      );
 
-            await AsyncStorage.setItem(
-                "order-details",
-                JSON.stringify(updatedOrderDetails)
-            );
-
-            router.push({
-                pathname: "/order/chooseLaundryMart",
-                params: {
-                    latitude: selectedAddress.latitude.toString(),
-                    longitude: selectedAddress.longitude.toString(),
-                    currentAddress: selectedAddress.currentAddress,
-                },
-            });
-        } catch (error) {
-            console.log(error);
-        }
+        router.push({
+            pathname: "/order/chooseLaundryMart",
+            params: {
+                latitude: selectedAddress.latitude.toString(),
+                longitude: selectedAddress.longitude.toString(),
+                currentAddress: selectedAddress.currentAddress,
+            },
+        });
     };
-
 
     return (
         <View className="flex-1 bg-white px-5 pt-5">
@@ -178,10 +155,9 @@ const PickupNowScreen = () => {
                 Where should we pick up your laundry?
             </Text>
 
-            {/* Saved Addresses */}
             <FlatList
                 data={addresses}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.type}
                 renderItem={({ item }) => (
                     <View
                         className={`flex-row justify-between items-center border rounded-2xl p-4 mb-3 ${selectedAddress?.id === item.id
@@ -194,35 +170,28 @@ const PickupNowScreen = () => {
                             className="flex-1 mr-3"
                         >
                             <Text className="text-lg font-semibold text-black">
-                                {item.label}
-                            </Text>
-                            <Text className="text-md text-gray-600 mt-1">
-                                {item.currentAddress}
-                            </Text>
-                        </TouchableOpacity>
+                              {item.type}
+                          </Text>
+                          <Text className="text-md text-gray-600 mt-1">
+                              {`${JSON.parse(item.location).street_address}, ${JSON.parse(item.location).city}`}
+                          </Text>
+                      </TouchableOpacity>
 
-                        {/* ⭐ new Update button */}
-                        {/* <TouchableOpacity
-                    onPress={() => handleEdit(item)}
+                      <TouchableOpacity
+                          onPress={() => handleEdit(item.type, item.id)}
                     className="bg-gray-100 px-3 py-2 rounded-lg"
                 >
                     <Ionicons name="create-outline" size={18} color="#017FC6" />
-                </TouchableOpacity> */}
+                      </TouchableOpacity>
 
-                        {/* {selectedAddress?.id === item.id && (
-                            <Ionicons
-                                name="checkmark-circle"
-                                size={24}
-                                color="#017FC6"
-                                style={{ marginLeft: 5 }}
-                            />
-                        )} */}
-                        <TouchableOpacity
-                            onPress={() => handleDeleteAddress(item)}
-                            className="bg-red-50 px-2 py-2 ml-2 rounded-full"
-                        >
-                            <Ionicons name="trash-outline" size={18} color="#DC2626" />
-                        </TouchableOpacity>
+                      {!item.type.includes("Home") && (
+                          <TouchableOpacity
+                              onPress={() => handleDeleteAddress(item.id)}
+                              className="bg-red-50 px-2 py-2 ml-2 rounded-full"
+                          >
+                              <Ionicons name="trash-outline" size={18} color="#DC2626" />
+                          </TouchableOpacity>
+                      )}
                     </View>
                 )}
                 ListEmptyComponent={
@@ -243,53 +212,13 @@ const PickupNowScreen = () => {
                 )}
             />
 
-            {/* Continue Button */}
             <TouchableOpacity
                 onPress={handleContinue}
                 disabled={!selectedAddress}
-                className="w-full absolute bottom-10 right-5 left-5 opacity-100"
+                className="w-full absolute bottom-10 right-5 left-5"
             >
                 <PrimaryButton text="Continue" />
             </TouchableOpacity>
-
-            {/* ⭐ Update Modal */}
-            <Modal
-                visible={editModalVisible}
-                transparent
-                animationType="slide"
-                onRequestClose={() => setEditModalVisible(false)}
-            >
-                <View className="flex-1 justify-center items-center bg-[rgba(0,0,0,0.3)] px-5">
-                    <View className="bg-white w-full rounded-2xl p-5">
-                        <Text className="text-lg font-semibold text-black mb-3">
-                            Update Address
-                        </Text>
-                        <TextInput
-                            placeholder="Enter new address"
-                            value={editAddressValue}
-                            onChangeText={setEditAddressValue}
-                            multiline
-                            className="border border-gray-300 rounded-lg px-3 py-2 h-24 text-gray-800"
-                        />
-
-                        <View className="flex-row justify-end mt-5">
-                            <TouchableOpacity
-                                onPress={() => setEditModalVisible(false)}
-                                className="px-4 py-2 mr-3 bg-gray-100 rounded-lg"
-                            >
-                                <Text className="text-gray-700 font-medium">Cancel</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={handleUpdateAddress}
-                                className="px-5 py-2 bg-[#017FC6] rounded-lg"
-                            >
-                                <Text className="text-white font-semibold">Save</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 };

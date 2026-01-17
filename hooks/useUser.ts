@@ -25,11 +25,7 @@ import {
   VerifyOtpPayload,
 } from "@/types/user.types";
 
-import {
-  clearProfile,
-  getStoredProfile,
-  storeProfile,
-} from "@/lib/profileStorage";
+import { clearProfile, storeProfile } from "@/lib/profileStorage";
 
 export const useUser = () => {
   const queryClient = useQueryClient();
@@ -46,7 +42,6 @@ export const useUser = () => {
       if (data?.tokens?.access) {
         await AsyncStorage.setItem("accessToken", data.tokens.access);
 
-        // fetch & cache profile immediately
         const profile = await getCustomerProfile();
         await storeProfile(profile);
 
@@ -59,15 +54,12 @@ export const useUser = () => {
   const customerProfileQuery = useQuery<CustomerProfile | null>({
     queryKey: ["customer-profile"],
     queryFn: async () => {
-      const cachedProfile = await getStoredProfile();
-      if (cachedProfile) return cachedProfile;
-
       const profile = await getCustomerProfile();
       await storeProfile(profile);
       return profile;
     },
     staleTime: Infinity,
-    gcTime: Infinity, // ✅ instead of cacheTime
+    gcTime: Infinity,
     retry: false,
   });
 
@@ -141,6 +133,10 @@ export const useUser = () => {
     /* queries */
     customerProfile: customerProfileQuery.data,
     customerProfileState: customerProfileQuery,
+
+    // ✅ ADD THESE (for pull-to-refresh)
+    refetchProfile: customerProfileQuery.refetch,
+    isProfileFetching: customerProfileQuery.isFetching,
 
     /* actions */
     register: registerMutation.mutateAsync,
