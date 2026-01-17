@@ -3,7 +3,7 @@ import { api } from "@/lib/axios";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Define the ordering options based on your API
 const SORT_OPTIONS = [
   { label: "Rating", value: "-average_rating" },
   { label: "Distance", value: "distance" },
@@ -24,60 +23,63 @@ const SORT_OPTIONS = [
 
 export default function ChooseLaundryMartScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
 
-  // 1. States for filtering and querying
   const [search, setSearch] = useState("");
   const [ordering, setOrdering] = useState("-average_rating");
-  const [lat, setLat] = useState(23.797301); // Default or get from expo-location
-  const [lng, setLng] = useState(90.399249);
 
-  // 2. Fetch Data using React Query
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["vendors", search, ordering, lat, lng],
+  // ⭐ NEW: mode state
+  const [mode, setMode] = useState<"all" | "choose">("all");
+
+  /* ---------------- ALL VENDORS ---------------- */
+  const {
+    data: vendorsData,
+    isLoading: vendorsLoading,
+  } = useQuery({
+    queryKey: ["vendors", search, ordering, params.latitude, params.longitude],
+    enabled: mode === "all",
     queryFn: async () => {
-      const res = await api.get(`/customers/api/vendors`, {
+      const res = await api.get("/customers/api/vendors", {
         params: {
-          lat: lat,
-          lng: lng,
-          ordering: ordering,
-          search: search,
-          page_size: 20, // Example page size
+          lat: params.latitude,
+          lng: params.longitude,
+          ordering,
+          search,
+          page_size: 10,
         },
       });
       return res.data;
     },
   });
 
-  // 3. Navigation handler
-  const handleVendorPress = (vendor: any) => {
-    router.push({
-      pathname: "/(customer)/order/laundryDetails", // Update this path to your actual details route
-      params: {
-        vendor_id: vendor.id,
-        // Passing details as params
-        name: vendor.laundrymart_name || "Unknown Laundry",
-        image: vendor.image,
-        rating: vendor.average_rating,
-        location: vendor.location,
-        is_open: vendor.is_open_now ? "true" : "false",
-      },
-    });
-  };
+  /* ---------------- CHOOSE FOR ME ---------------- */
+  const {
+    data: chooseData,
+    isLoading: chooseLoading,
+  } = useQuery({
+    queryKey: ["choose-for-me"],
+    enabled: mode === "choose",
+    queryFn: async () => {
+      const res = await api.get("/customers/api/choose-for-customer");
+      return res.data ?? [];
+    },
+  });
 
-  // console.log(JSON.stringify(data, null, 2))
+  const listData =
+    mode === "choose" ? chooseData ?? [] : vendorsData?.results ?? [];
+
+  const isLoading = mode === "choose" ? chooseLoading : vendorsLoading;
 
   useEffect(() => {
-    const loadAddresses = async () => {
-      const orderDetails = await AsyncStorage.getItem("order-details");
-      // console.log("orderdetails", orderDetails)
-
+    const loadOrderDetails = async () => {
+      await AsyncStorage.getItem("order-details");
     };
-    loadAddresses();
+    loadOrderDetails();
   }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-white px-5">
-      {/* Search Bar */}
+      {/* Search */}
       <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-2 mb-4 mt-2">
         <Ionicons name="search" size={20} color="#64748b" />
         <TextInput
@@ -85,57 +87,76 @@ export default function ChooseLaundryMartScreen() {
           className="flex-1 ml-2 text-sm text-[#1E293B]"
           value={search}
           onChangeText={setSearch}
+          editable={mode === "all"} // 🔒 disable search in choose mode
         />
       </View>
 
-      {/* Sort by section */}
+      {/* Header Row */}
       <View className="flex-row items-center justify-between mb-4">
         <Text className="text-sm font-bold text-[#1E293B]">
-          Results ({data?.count || 0})
+          {mode === "choose"
+            ? "Recommended for you"
+            : `Results (${vendorsData?.count || 0})`}
         </Text>
 
-        <View className="flex-row items-center">
-          <Text className="text-xs text-gray-500 mr-2">Sort by:</Text>
+        {mode === "all" && (
           <TouchableOpacity
             className="flex-row items-center bg-[#F8FAFC] border border-gray-200 px-3 py-2 rounded-lg"
             onPress={() => {
-              // Logic to cycle through sorts or open a bottom sheet
-              const currentIndex = SORT_OPTIONS.findIndex(opt => opt.value === ordering);
+              const currentIndex = SORT_OPTIONS.findIndex(
+                (opt) => opt.value === ordering
+              );
               const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length;
               setOrdering(SORT_OPTIONS[nextIndex].value);
             }}
           >
             <Text className="text-sm font-medium text-[#1E293B] mr-1">
-              {SORT_OPTIONS.find(opt => opt.value === ordering)?.label}
+              {SORT_OPTIONS.find((opt) => opt.value === ordering)?.label}
             </Text>
             <Ionicons name="swap-vertical" size={14} color="#475569" />
           </TouchableOpacity>
-        </View>
+        )}
       </View>
 
-      {/* Loading & List */}
+      {/* List */}
       {isLoading ? (
         <View className="flex-1 justify-center">
           <ActivityIndicator size="large" color="#000" />
         </View>
       ) : (
         <FlatList
-            data={data?.results || []}
-            // FIX: Use store_id, fallback to id, fallback to index to guarantee uniqueness
-            keyExtractor={(item, index) => {
-              return item.store_id?.toString() || item.id?.toString() || index.toString();
-            }}
+            data={listData}
+            keyExtractor={(item, index) =>
+              item.store_id?.toString() || item.id?.toString() || index.toString()
+            }
             renderItem={({ item }) => <LaundryCard item={item} />}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 90 }}
             ListEmptyComponent={
-              !isLoading && (
-                <View className="mt-20 items-center">
-                  <Text className="text-gray-400">No vendors available.</Text>
-                </View>
-            )
+            <View className="mt-20 items-center">
+              <Text className="text-gray-400">No vendors available.</Text>
+            </View>
           }
         />
       )}
+
+      {/* ⭐ BOTTOM TOGGLE BUTTON */}
+      <View className="absolute bottom-5 left-5 right-5">
+        <TouchableOpacity
+          onPress={() =>
+            setMode((prev) => (prev === "all" ? "choose" : "all"))
+          }
+          className={`h-12 rounded-xl items-center justify-center ${mode === "choose" ? "bg-gray-200" : "bg-[#017FC6]"
+            }`}
+        >
+          <Text
+            className={`font-semibold ${mode === "choose" ? "text-gray-800" : "text-white"
+              }`}
+          >
+            {mode === "choose" ? "Show All Vendors" : "Choose For Me"}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

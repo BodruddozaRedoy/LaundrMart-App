@@ -36,6 +36,8 @@ const PickupNowScreen = () => {
         },
     });
 
+    console.log(selectedAddress)
+
     useEffect(() => {
         if (addresses.length > 0 && !selectedAddress) {
             setSelectedAddress(addresses[0]);
@@ -132,18 +134,18 @@ const PickupNowScreen = () => {
             "order-details",
             JSON.stringify({
                 ...parsedPrev,
-                pickup_address: addressPayload,
-                latitude: selectedAddress.latitude.toString(),
-                longitude: selectedAddress.longitude.toString(),
+                pickup_address: selectedAddress.location,
+                latitude: selectedAddress.lat?.toString(),
+                longitude: selectedAddress.lng?.toString(),
           })
       );
 
         router.push({
             pathname: "/order/chooseLaundryMart",
             params: {
-                latitude: selectedAddress.latitude.toString(),
-                longitude: selectedAddress.longitude.toString(),
-                currentAddress: selectedAddress.currentAddress,
+                latitude: selectedAddress.lat.toString(),
+                longitude: selectedAddress.lng.toString(),
+                currentAddress: selectedAddress.location,
             },
         });
     };
