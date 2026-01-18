@@ -102,7 +102,7 @@ export default function ReviewOrderScreen() {
 
       const confirmPayload = {
         service_type: payload.service_type,
-        quote_id: quote.quote_id,
+        quote_id: payload.service_type === "full_service" ? quote.first_quote.id : quote.quote_id,
         manifest_items,
 
         pickup_address: payload.pickup_address,
@@ -148,7 +148,7 @@ export default function ReviewOrderScreen() {
       setShowPaymentModal(true);
       // router.push("/order/orderConfirm");
     } catch (error: any) {
-      console.log("Confirm order failed:", error?.response?.data);
+      console.log("Confirm order failed:", JSON.stringify(error?.response?.data, null, 2));
     } finally {
       setLoading(false);
     }
